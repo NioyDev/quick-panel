@@ -406,7 +406,7 @@ class QuickDock(Gtk.Window):
                     self.app_buttons[unpinned_id].dock_windows.append(win)
                     
         self.update_classes()
-        self.show_all()
+        self.win_box.show_all()
         GLib.idle_add(self.reposition)
         GLib.timeout_add(500, self.remove_struts)
         
