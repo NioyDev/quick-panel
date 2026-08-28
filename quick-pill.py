@@ -7,7 +7,8 @@ import sys
 import gi
 sys.path.append('/home/nioy/.local/bin')
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib
+gi.require_version('Wnck', '3.0')
+from gi.repository import Gtk, Gdk, GLib, Wnck
 from sync_manager import SyncManager
 
 class QuickPill(Gtk.Window):
