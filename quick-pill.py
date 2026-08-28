@@ -109,6 +109,7 @@ class QuickPill(Gtk.Window):
         GLib.idle_add(self.reposition)
         GLib.timeout_add(500, self.remove_struts)
         self.setup_fullscreen_detector()
+        GLib.timeout_add(1000, self.enforce_visibility)
 
     def setup_fullscreen_detector(self):
         try:
@@ -198,18 +199,29 @@ class QuickPill(Gtk.Window):
         
     def should_show_dock(self):
         try:
-            win = self.wnck_screen.get_active_window()
-            if not win: return True
-            
-            is_fs = win.is_fullscreen()
-            geom = win.get_geometry()
             display = Gdk.Display.get_default()
             monitor = display.get_primary_monitor()
             m_geom = monitor.get_geometry()
-            is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized() and win.get_window_type() != Wnck.WindowType.DESKTOP)
-            return not (is_fs or is_borderless)
+            
+            for win in self.wnck_screen.get_windows():
+                if win.get_window_type() == Wnck.WindowType.DESKTOP: continue
+                if win.is_fullscreen(): return False
+                
+                geom = win.get_geometry()
+                if geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized():
+                    return False
+            return True
         except:
             return True
+
+    def enforce_visibility(self):
+        if not self.should_show_dock():
+            if self.get_mapped():
+                self.hide()
+        else:
+            if not self.get_mapped():
+                self.show_all()
+        return True
 
     def show_dock(self):
         if not self.should_show_dock():
