@@ -221,13 +221,23 @@ class QuickDock(Gtk.Window):
             monitor = display.get_primary_monitor()
             m_geom = monitor.get_geometry()
             
-            for win in self.wnck_screen.get_windows():
-                if win.get_window_type() == Wnck.WindowType.DESKTOP: continue
-                if win.is_fullscreen(): return False
+            active_win = self.wnck_screen.get_active_window()
+            if not active_win: return True
+            if active_win.get_window_type() == Wnck.WindowType.DESKTOP: return True
+            
+            geom = active_win.get_geometry()
+            is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not active_win.is_maximized())
+            if active_win.is_fullscreen() or is_borderless:
+                return False
                 
-                geom = win.get_geometry()
-                if geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized():
-                    return False
+            active_app = active_win.get_application()
+            if active_app:
+                for w in active_app.get_windows():
+                    if w == active_win: continue
+                    if w.is_fullscreen(): return False
+                    w_geom = w.get_geometry()
+                    if w_geom.widthp >= m_geom.width and w_geom.heightp >= m_geom.height and not w.is_maximized():
+                        return False
             return True
         except:
             return True
