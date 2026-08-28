@@ -117,14 +117,14 @@ class QuickPill(Gtk.Window):
             self.wnck_screen.force_update()
             self.wnck_screen.connect("active-window-changed", self.on_active_window_changed)
         except Exception as e:
-            pass
+            print("Wnck error:", e)
 
     def on_active_window_changed(self, screen, previously_active_window):
         win = screen.get_active_window()
         if win and win.is_fullscreen():
-            self.set_keep_above(False)
+            self.hide()
         else:
-            self.set_keep_above(True)
+            self.show_all()
 
     def reposition(self):
         display = Gdk.Display.get_default()

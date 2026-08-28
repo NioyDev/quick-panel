@@ -250,9 +250,9 @@ class QuickDock(Gtk.Window):
     def on_active_window_changed(self, screen, previously_active_window):
         win = screen.get_active_window()
         if win and win.is_fullscreen():
-            self.set_keep_above(False)
+            self.hide()
         else:
-            self.set_keep_above(True)
+            self.show_all()
         self.update_classes()
 
     def get_window_class(self, win):
