@@ -121,7 +121,19 @@ class QuickPill(Gtk.Window):
 
     def on_active_window_changed(self, screen, previously_active_window):
         win = screen.get_active_window()
-        if win and win.is_fullscreen():
+        if not win:
+            self.show_all()
+            return
+            
+        is_fs = win.is_fullscreen()
+        geom = win.get_geometry()
+        display = Gdk.Display.get_default()
+        monitor = display.get_primary_monitor()
+        m_geom = monitor.get_geometry()
+        
+        is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized())
+        
+        if is_fs or is_borderless:
             self.hide()
         else:
             self.show_all()
