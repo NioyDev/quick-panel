@@ -134,7 +134,7 @@ class QuickPill(Gtk.Window):
         monitor = display.get_primary_monitor()
         m_geom = monitor.get_geometry()
         
-        is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized())
+        is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized() and win.get_window_type() != Wnck.WindowType.DESKTOP)
         
         if is_fs or is_borderless:
             self.hide()
@@ -205,7 +205,7 @@ class QuickPill(Gtk.Window):
             display = Gdk.Display.get_default()
             monitor = display.get_primary_monitor()
             m_geom = monitor.get_geometry()
-            is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized())
+            is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized() and win.get_window_type() != Wnck.WindowType.DESKTOP)
             return not (is_fs or is_borderless)
         except:
             return True
