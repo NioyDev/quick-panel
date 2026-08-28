@@ -116,6 +116,9 @@ class QuickPill(Gtk.Window):
             self.wnck_screen = Wnck.Screen.get_default()
             self.wnck_screen.force_update()
             self.wnck_screen.connect("active-window-changed", self.on_active_window_changed)
+            
+            # Check initial state
+            GLib.idle_add(lambda: self.on_active_window_changed(self.wnck_screen, None) or False)
         except Exception as e:
             print("Wnck error:", e)
 
@@ -158,6 +161,8 @@ class QuickPill(Gtk.Window):
         return False
 
     def show_dock_sync(self):
+        if not self.should_show_dock():
+            return
         if self.hide_timer:
             GLib.source_remove(self.hide_timer)
             self.hide_timer = None
@@ -190,7 +195,24 @@ class QuickPill(Gtk.Window):
         self.start_animation()
         return False
         
+    def should_show_dock(self):
+        try:
+            win = self.wnck_screen.get_active_window()
+            if not win: return True
+            
+            is_fs = win.is_fullscreen()
+            geom = win.get_geometry()
+            display = Gdk.Display.get_default()
+            monitor = display.get_primary_monitor()
+            m_geom = monitor.get_geometry()
+            is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized())
+            return not (is_fs or is_borderless)
+        except:
+            return True
+
     def show_dock(self):
+        if not self.should_show_dock():
+            return
         self.target_y = self.base_y
         self.start_animation()
         

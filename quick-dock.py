@@ -85,6 +85,9 @@ class QuickDock(Gtk.Window):
         self.wnck_screen.connect("window-closed", self.on_window_changed)
         self.wnck_screen.connect("active-window-changed", self.on_active_window_changed)
         
+        # Check initial state
+        GLib.idle_add(lambda: self.on_active_window_changed(self.wnck_screen, None) or False)
+        
         self.app_buttons = {} # tracking by wm_class or desktop_id
         
         self.pinned_info = self.load_pinned_apps()
@@ -177,6 +180,8 @@ class QuickDock(Gtk.Window):
         return pinned
 
     def show_dock_sync(self):
+        if not self.should_show_dock():
+            return
         if self.hide_timer:
             GLib.source_remove(self.hide_timer)
             self.hide_timer = None
@@ -209,7 +214,24 @@ class QuickDock(Gtk.Window):
         self.start_animation()
         return False
         
+    def should_show_dock(self):
+        try:
+            win = self.wnck_screen.get_active_window()
+            if not win: return True
+            
+            is_fs = win.is_fullscreen()
+            geom = win.get_geometry()
+            display = Gdk.Display.get_default()
+            monitor = display.get_primary_monitor()
+            m_geom = monitor.get_geometry()
+            is_borderless = (geom.widthp >= m_geom.width and geom.heightp >= m_geom.height and not win.is_maximized())
+            return not (is_fs or is_borderless)
+        except:
+            return True
+
     def show_dock(self):
+        if not self.should_show_dock():
+            return
         self.target_y = self.base_y
         self.start_animation()
         
