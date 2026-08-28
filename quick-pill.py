@@ -107,6 +107,24 @@ class QuickPill(Gtk.Window):
         self.update_status()
         GLib.idle_add(self.reposition)
         GLib.timeout_add(500, self.remove_struts)
+        self.setup_fullscreen_detector()
+
+    def setup_fullscreen_detector(self):
+        try:
+            gi.require_version('Wnck', '3.0')
+            from gi.repository import Wnck
+            self.wnck_screen = Wnck.Screen.get_default()
+            self.wnck_screen.force_update()
+            self.wnck_screen.connect("active-window-changed", self.on_active_window_changed)
+        except Exception as e:
+            pass
+
+    def on_active_window_changed(self, screen, previously_active_window):
+        win = screen.get_active_window()
+        if win and win.is_fullscreen():
+            self.set_keep_above(False)
+        else:
+            self.set_keep_above(True)
 
     def reposition(self):
         display = Gdk.Display.get_default()
