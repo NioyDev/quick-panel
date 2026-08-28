@@ -480,7 +480,7 @@ class QuickDock(Gtk.Window):
         monitor = display.get_primary_monitor()
         geometry = monitor.get_geometry()
         
-        target_width = geometry.width - 550
+        target_width = geometry.width - 460
         
         self.set_size_request(target_width, -1)
         self.scroll.set_min_content_width(-1)
