@@ -60,6 +60,7 @@ class QuickDock(Gtk.Window):
         
         self.scroll = Gtk.ScrolledWindow()
         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
+        self.scroll.set_propagate_natural_width(True)
         self.scroll.add(self.win_box)
         self.main_box.pack_start(self.scroll, True, True, 4)
         
@@ -482,7 +483,7 @@ class QuickDock(Gtk.Window):
         
         target_width = geometry.width - 550
         
-        self.set_size_request(target_width, -1)
+        self.scroll.set_max_content_width(target_width)
         self.scroll.set_min_content_width(-1)
         width, height = self.get_size()
         
