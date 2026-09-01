@@ -18,12 +18,10 @@ PINNED_APPS = [
     "xfce4-terminal.desktop"
 ]
 
-class QuickDock(Gtk.Window):
-    def __init__(self, wnck_screen, pill):
+class QuickPanel(Gtk.Window):
+    def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
-        self.wnck_screen = wnck_screen
-        self.pill = pill
-        self.set_title("QuickDock")
+        self.set_title("QuickPanel")
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
@@ -40,16 +38,15 @@ class QuickDock(Gtk.Window):
         self.setup_css()
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.main_box.set_name("dock_box")
+        self.main_box.set_name("panel_box")
         self.main_box.set_margin_bottom(8)
         
+        # --- LEFT SIDE (Launcher & Apps) ---
         self.btn_launcher = Gtk.Button()
-        self.btn_launcher.set_name("dock_btn")
+        self.btn_launcher.set_name("panel_btn")
         self.btn_launcher.set_can_focus(False)
         self.btn_launcher.connect("clicked", self.on_launcher_clicked)
-        icon_launcher = Gtk.Image.new_from_icon_name("view-app-grid-symbolic", Gtk.IconSize.MENU)
-        self.btn_launcher.add(icon_launcher)
-        
+        self.btn_launcher.add(Gtk.Image.new_from_icon_name("view-app-grid-symbolic", Gtk.IconSize.MENU))
         self.main_box.pack_start(self.btn_launcher, False, False, 4)
         
         sep = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
@@ -61,7 +58,57 @@ class QuickDock(Gtk.Window):
         self.scroll = Gtk.ScrolledWindow()
         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
         self.scroll.add(self.win_box)
-        self.main_box.pack_start(self.scroll, True, True, 4)
+        # Pack the scroll window but DO NOT let it expand to fill everything
+        self.main_box.pack_start(self.scroll, False, False, 4)
+        
+        # --- CENTER (Spacer) ---
+        spacer = Gtk.Box()
+        self.main_box.pack_start(spacer, True, True, 0)
+        
+        # --- RIGHT SIDE (Indicators) ---
+        def make_indicator():
+            b = Gtk.Button()
+            b.set_name("pill_item")
+            b.set_can_focus(False)
+            return b
+            
+        self.btn_vol = make_indicator()
+        self.icon_vol = Gtk.Image.new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.MENU)
+        self.btn_vol.add(self.icon_vol)
+        self.btn_vol.connect("clicked", lambda x: subprocess.Popen(["pavucontrol"]))
+        self.main_box.pack_start(self.btn_vol, False, False, 0)
+        
+        self.btn_bright = make_indicator()
+        self.btn_bright.add(Gtk.Image.new_from_icon_name("display-brightness-symbolic", Gtk.IconSize.MENU))
+        self.btn_bright.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-brightness.py"]))
+        self.main_box.pack_start(self.btn_bright, False, False, 0)
+        
+        self.btn_wifi = make_indicator()
+        self.btn_wifi.add(Gtk.Image.new_from_icon_name("network-wireless-symbolic", Gtk.IconSize.MENU))
+        self.btn_wifi.connect("clicked", lambda x: subprocess.Popen(["nm-connection-editor"]))
+        self.main_box.pack_start(self.btn_wifi, False, False, 0)
+        
+        self.btn_bat = make_indicator()
+        self.icon_bat = Gtk.Image.new_from_icon_name("battery-good-symbolic", Gtk.IconSize.MENU)
+        self.lbl_bat = Gtk.Label()
+        box_bat = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+        box_bat.pack_start(self.icon_bat, False, False, 0)
+        box_bat.pack_start(self.lbl_bat, False, False, 0)
+        self.btn_bat.add(box_bat)
+        self.btn_bat.connect("clicked", lambda x: subprocess.Popen(["xfce4-power-manager-settings"]))
+        self.main_box.pack_start(self.btn_bat, False, False, 0)
+        
+        self.btn_time = make_indicator()
+        self.lbl_time = Gtk.Label()
+        self.lbl_time.set_name("pill_label")
+        self.btn_time.add(self.lbl_time)
+        self.btn_time.connect("clicked", lambda x: subprocess.Popen(["orage"]))
+        self.main_box.pack_start(self.btn_time, False, False, 0)
+        
+        self.btn_power = make_indicator()
+        self.btn_power.add(Gtk.Image.new_from_icon_name("system-shutdown-symbolic", Gtk.IconSize.MENU))
+        self.btn_power.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-power.py"]))
+        self.main_box.pack_start(self.btn_power, False, False, 4)
         
         self.add(self.main_box)
         
@@ -78,9 +125,23 @@ class QuickDock(Gtk.Window):
         self.app_buttons = {}
         self.pinned_info = self.load_pinned_apps()
         
+        self.wnck_screen = Wnck.Screen.get_default()
+        self.wnck_screen.force_update()
+        self.wnck_screen.connect("window-opened", self.on_window_changed)
+        self.wnck_screen.connect("window-closed", self.on_window_changed)
+        self.wnck_screen.connect("active-window-changed", self.on_active_window_changed)
+        
+        GLib.idle_add(lambda: self.on_active_window_changed(self.wnck_screen, None) or False)
+        GLib.timeout_add(1000, self.enforce_visibility)
+        
+        GLib.timeout_add_seconds(1, self.update_status)
+        self.update_status()
+        
         GLib.idle_add(self.refresh_windows)
         GLib.idle_add(self.reposition)
         GLib.timeout_add(500, self.remove_struts)
+        
+        self.hide_timer = GLib.timeout_add(2000, self.hide_panel)
 
     def remove_struts(self):
         if self.get_window():
@@ -91,40 +152,42 @@ class QuickDock(Gtk.Window):
 
     def setup_css(self):
         css = b'''
-        * { outline: none; }
+        * { outline: none; font-family: system-ui, sans-serif; }
         window, scrolledwindow, viewport { background-color: transparent; }
-        #dock_box {
+        #panel_box {
             background-color: #18181b;
             border-radius: 20px;
             border: 1px solid #27272a;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            padding: 4px 12px;
+            padding: 4px;
         }
-        #dock_btn {
+        #panel_btn, #pill_item {
             background-color: transparent;
+            color: #fafafa;
             border: none;
             box-shadow: none;
-            border-radius: 8px;
-            padding: 2px 4px;
-            min-width: 24px;
+            border-radius: 12px;
+            padding: 4px 10px;
             transition: all 200ms ease-in-out;
         }
-        #dock_btn:hover { background-color: #27272a; }
-        #dock_btn.running {
-            padding: 2px 10px;
+        #panel_btn { min-width: 24px; }
+        #panel_btn:hover, #pill_item:hover { background-color: #27272a; }
+        #panel_btn.running {
+            padding: 4px 14px;
             border-bottom: 2px solid #3f3f46;
             background-color: #27272a;
         }
-        #dock_btn.active {
-            padding: 2px 10px;
+        #panel_btn.active {
+            padding: 4px 14px;
             border-bottom: 2px solid #60a5fa;
             background-color: #3f3f46;
         }
-        #app_label {
+        #app_label, #pill_label {
             color: #fafafa;
             font-size: 13px;
             font-weight: 500;
         }
+        image { color: #fafafa; }
         '''
         provider = Gtk.CssProvider()
         provider.load_from_data(css)
@@ -146,29 +209,22 @@ class QuickDock(Gtk.Window):
         if self.hide_timer:
             GLib.source_remove(self.hide_timer)
             self.hide_timer = None
-        self.show_dock()
-        if self.pill:
-            if self.pill.hide_timer:
-                GLib.source_remove(self.pill.hide_timer)
-                self.pill.hide_timer = None
-            self.pill.show_dock()
+        self.show_panel()
         return False
         
     def on_mouse_leave(self, widget, event):
         if event.detail == Gdk.NotifyType.INFERIOR: return False
-        self.hide_timer = GLib.timeout_add(2000, self.hide_dock)
-        if self.pill:
-            self.pill.hide_timer = GLib.timeout_add(2000, self.pill.hide_dock)
+        self.hide_timer = GLib.timeout_add(2000, self.hide_panel)
         return False
         
-    def hide_dock(self):
+    def hide_panel(self):
         self.hide_timer = None
         geometry = Gdk.Display.get_default().get_primary_monitor().get_geometry()
         self.target_y = geometry.height - 2
         self.start_animation()
         return False
 
-    def show_dock(self):
+    def show_panel(self):
         self.target_y = self.base_y
         self.start_animation()
         
@@ -225,7 +281,7 @@ class QuickDock(Gtk.Window):
         
         for p in self.pinned_info:
             btn = Gtk.Button()
-            btn.set_name("dock_btn")
+            btn.set_name("panel_btn")
             btn.set_can_focus(False)
             icon = p['icon']
             if icon: img = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.MENU)
@@ -259,7 +315,7 @@ class QuickDock(Gtk.Window):
                 unpinned_id = "unpinned_" + wm_class
                 if unpinned_id not in self.app_buttons:
                     btn = Gtk.Button()
-                    btn.set_name("dock_btn")
+                    btn.set_name("panel_btn")
                     btn.set_can_focus(False)
                     pixbuf = win.get_icon()
                     if pixbuf:
@@ -291,7 +347,6 @@ class QuickDock(Gtk.Window):
         self.update_classes()
         self.win_box.show_all()
         GLib.idle_add(self.reposition)
-        GLib.timeout_add(500, self.remove_struts)
         
     def update_classes(self):
         active_win = self.wnck_screen.get_active_window()
@@ -328,201 +383,6 @@ class QuickDock(Gtk.Window):
                     windows[(idx + 1) % len(windows)].activate(int(time.time()))
             else:
                 windows[0].activate(int(time.time()))
-            
-    def reposition(self):
-        geometry = Gdk.Display.get_default().get_primary_monitor().get_geometry()
-        self.set_size_request(geometry.width - 420, -1)
-        self.scroll.set_min_content_width(-1)
-        width, height = self.get_size()
-        self.base_y = geometry.height - height
-        if self.current_y == 0:
-            self.current_y = self.base_y
-            self.move(16, self.base_y)
-        return False
-
-class QuickPill(Gtk.Window):
-    def __init__(self, wnck_screen, dock):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
-        self.wnck_screen = wnck_screen
-        self.dock = dock
-        self.set_decorated(False)
-        self.set_skip_taskbar_hint(True)
-        self.set_skip_pager_hint(True)
-        self.set_keep_above(True)
-        self.set_type_hint(Gdk.WindowTypeHint.DOCK)
-        self.set_accept_focus(False)
-        self.set_app_paintable(True)
-        
-        screen = self.get_screen()
-        visual = screen.get_rgba_visual()
-        if visual and screen.is_composited():
-            self.set_visual(visual)
-
-        self.setup_css()
-        self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
-        self.main_box.set_name("pill_box")
-        self.main_box.set_margin_bottom(8)
-        self.main_box.set_margin_end(16)
-        
-        def make_btn():
-            b = Gtk.Button()
-            b.set_name("pill_item")
-            b.set_can_focus(False)
-            return b
-            
-        self.btn_vol = make_btn()
-        self.icon_vol = Gtk.Image.new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.MENU)
-        self.btn_vol.add(self.icon_vol)
-        self.btn_vol.connect("clicked", lambda x: subprocess.Popen(["pavucontrol"]))
-        self.main_box.pack_start(self.btn_vol, False, False, 0)
-        
-        self.btn_bright = make_btn()
-        self.btn_bright.add(Gtk.Image.new_from_icon_name("display-brightness-symbolic", Gtk.IconSize.MENU))
-        self.btn_bright.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-brightness.py"]))
-        self.main_box.pack_start(self.btn_bright, False, False, 0)
-        
-        self.btn_wifi = make_btn()
-        self.btn_wifi.add(Gtk.Image.new_from_icon_name("network-wireless-symbolic", Gtk.IconSize.MENU))
-        self.btn_wifi.connect("clicked", lambda x: subprocess.Popen(["nm-connection-editor"]))
-        self.main_box.pack_start(self.btn_wifi, False, False, 0)
-        
-        self.btn_bat = make_btn()
-        self.icon_bat = Gtk.Image.new_from_icon_name("battery-good-symbolic", Gtk.IconSize.MENU)
-        self.lbl_bat = Gtk.Label()
-        box_bat = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
-        box_bat.pack_start(self.icon_bat, False, False, 0)
-        box_bat.pack_start(self.lbl_bat, False, False, 0)
-        self.btn_bat.add(box_bat)
-        self.btn_bat.connect("clicked", lambda x: subprocess.Popen(["xfce4-power-manager-settings"]))
-        self.main_box.pack_start(self.btn_bat, False, False, 0)
-        
-        self.btn_time = make_btn()
-        self.lbl_time = Gtk.Label()
-        self.lbl_time.set_name("pill_label")
-        self.btn_time.add(self.lbl_time)
-        self.btn_time.connect("clicked", lambda x: subprocess.Popen(["orage"]))
-        self.main_box.pack_start(self.btn_time, False, False, 0)
-        
-        self.btn_power = make_btn()
-        self.btn_power.add(Gtk.Image.new_from_icon_name("system-shutdown-symbolic", Gtk.IconSize.MENU))
-        self.btn_power.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-power.py"]))
-        self.main_box.pack_start(self.btn_power, False, False, 0)
-        
-        self.add(self.main_box)
-        
-        self.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK)
-        self.connect("enter-notify-event", self.on_mouse_enter)
-        self.connect("leave-notify-event", self.on_mouse_leave)
-        
-        self.hide_timer = None
-        self.anim_timer = None
-        self.current_y = 0
-        self.target_y = 0
-        self.base_y = 0
-        
-        GLib.timeout_add_seconds(1, self.update_status)
-        self.update_status()
-        GLib.idle_add(self.reposition)
-        GLib.timeout_add(500, self.remove_struts)
-
-    def remove_struts(self):
-        if self.get_window():
-            xid = self.get_window().get_xid()
-            subprocess.Popen(['xprop', '-id', str(xid), '-remove', '_NET_WM_STRUT_PARTIAL'])
-            subprocess.Popen(['xprop', '-id', str(xid), '-remove', '_NET_WM_STRUT'])
-        return False
-
-    def setup_css(self):
-        css = b'''
-        * { outline: none; font-family: system-ui, sans-serif; }
-        window { background-color: transparent; }
-        #pill_box {
-            background-color: #18181b;
-            border-radius: 20px;
-            border: 1px solid #27272a;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            padding: 4px;
-        }
-        #pill_item {
-            background-color: transparent;
-            color: #fafafa;
-            border-radius: 16px;
-            border: none;
-            box-shadow: none;
-            padding: 4px 10px;
-            transition: all 200ms ease;
-        }
-        #pill_item:hover { background-color: #27272a; }
-        #pill_item:active { background-color: #3f3f46; }
-        #pill_label { color: #fafafa; font-size: 13px; font-weight: 500; }
-        image { color: #fafafa; }
-        '''
-        provider = Gtk.CssProvider()
-        provider.load_from_data(css)
-        Gtk.StyleContext.add_provider_for_screen(
-            Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-
-    def reposition(self):
-        geometry = Gdk.Display.get_default().get_primary_monitor().get_geometry()
-        width, height = self.get_size()
-        x = geometry.width - width
-        self.base_y = geometry.height - height
-        if self.current_y == 0:
-            self.current_y = self.base_y
-            self.move(x, self.base_y)
-        else:
-            self.move(x, self.current_y)
-        return False
-
-    def on_mouse_enter(self, widget, event):
-        if event.detail == Gdk.NotifyType.INFERIOR: return False
-        if self.hide_timer:
-            GLib.source_remove(self.hide_timer)
-            self.hide_timer = None
-        self.show_dock()
-        if self.dock:
-            if self.dock.hide_timer:
-                GLib.source_remove(self.dock.hide_timer)
-                self.dock.hide_timer = None
-            self.dock.show_dock()
-        return False
-        
-    def on_mouse_leave(self, widget, event):
-        if event.detail == Gdk.NotifyType.INFERIOR: return False
-        self.hide_timer = GLib.timeout_add(2000, self.hide_dock)
-        if self.dock:
-            self.dock.hide_timer = GLib.timeout_add(2000, self.dock.hide_dock)
-        return False
-        
-    def hide_dock(self):
-        self.hide_timer = None
-        geometry = Gdk.Display.get_default().get_primary_monitor().get_geometry()
-        self.target_y = geometry.height - 2
-        self.start_animation()
-        return False
-
-    def show_dock(self):
-        self.target_y = self.base_y
-        self.start_animation()
-        
-    def start_animation(self):
-        if self.anim_timer: GLib.source_remove(self.anim_timer)
-        self.anim_timer = GLib.timeout_add(16, self.animate_step)
-
-    def animate_step(self):
-        x, y = self.get_position()
-        diff = self.target_y - y
-        if abs(diff) <= 2:
-            self.move(x, self.target_y)
-            self.current_y = self.target_y
-            self.anim_timer = None
-            return False
-        step = int(diff * 0.2)
-        if step == 0: step = 1 if diff > 0 else -1
-        new_y = y + step
-        self.move(x, new_y)
-        self.current_y = new_y
-        return True
 
     def update_status(self):
         now = datetime.datetime.now()
@@ -568,34 +428,13 @@ class QuickPill(Gtk.Window):
         except: pass
         return True
 
-
-class PanelManager:
-    def __init__(self):
-        self.wnck_screen = Wnck.Screen.get_default()
-        self.wnck_screen.force_update()
-        
-        self.dock = QuickDock(self.wnck_screen, None)
-        self.pill = QuickPill(self.wnck_screen, self.dock)
-        self.dock.pill = self.pill
-        
-        self.wnck_screen.connect("window-opened", self.on_window_changed)
-        self.wnck_screen.connect("window-closed", self.on_window_changed)
-        self.wnck_screen.connect("active-window-changed", self.on_active_window_changed)
-        
-        GLib.idle_add(lambda: self.on_active_window_changed(self.wnck_screen, None) or False)
-        GLib.timeout_add(1000, self.enforce_visibility)
-        
-        # Ocultar paneles despues de 2 segundos de iniciar
-        self.dock.hide_timer = GLib.timeout_add(2000, self.dock.hide_dock)
-        self.pill.hide_timer = GLib.timeout_add(2000, self.pill.hide_dock)
-
     def on_window_changed(self, screen, window):
         if window:
             if window.is_skip_pager() or window.is_skip_tasklist() or window.get_window_type() != Wnck.WindowType.NORMAL:
                 return
-        self.dock.refresh_windows()
+        self.refresh_windows()
 
-    def should_show_panels(self):
+    def should_show_panel(self):
         try:
             display = Gdk.Display.get_default()
             monitor = display.get_primary_monitor()
@@ -625,40 +464,42 @@ class PanelManager:
     def on_active_window_changed(self, screen, previously_active_window):
         win = screen.get_active_window()
         if not win:
-            self.show_panels()
-            self.dock.update_classes()
+            self.show_panel()
+            self.update_classes()
             return
             
-        if self.should_show_panels():
-            self.show_panels()
+        if self.should_show_panel():
+            self.show_panel()
         else:
-            self.hide_panels()
+            self.hide_panel()
             
-        self.dock.update_classes()
+        self.update_classes()
 
     def enforce_visibility(self):
-        if not self.should_show_panels():
-            if self.dock.get_mapped(): self.dock.hide()
-            if self.pill.get_mapped(): self.pill.hide()
+        if not self.should_show_panel():
+            if self.get_mapped(): self.hide()
         else:
-            if not self.dock.get_mapped(): self.dock.show_all()
-            if not self.pill.get_mapped(): self.pill.show_all()
+            if not self.get_mapped(): self.show_all()
         return True
 
-    def show_panels(self):
-        if self.dock.hide_timer: GLib.source_remove(self.dock.hide_timer)
-        if self.pill.hide_timer: GLib.source_remove(self.pill.hide_timer)
-        self.dock.hide_timer = None
-        self.pill.hide_timer = None
-        self.dock.show_dock()
-        self.pill.show_dock()
+    def reposition(self):
+        geometry = Gdk.Display.get_default().get_primary_monitor().get_geometry()
+        
+        # Configure width (16px margin on left and right = 32px subtracted)
+        target_width = geometry.width - 32
+        self.set_size_request(target_width, -1)
+        
+        width, height = self.get_size()
+        x = 16
+        self.base_y = geometry.height - height
+        
+        if self.current_y == 0:
+            self.current_y = self.base_y
+            self.move(x, self.base_y)
+            
+        return False
 
-    def hide_panels(self):
-        self.dock.hide_dock()
-        self.pill.hide_dock()
-
-if __name__ == '__main__':
-    manager = PanelManager()
-    manager.dock.show_all()
-    manager.pill.show_all()
+if __name__ == "__main__":
+    app = QuickPanel()
+    app.show_all()
     Gtk.main()
