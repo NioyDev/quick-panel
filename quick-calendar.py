@@ -126,8 +126,8 @@ class QuickCalendar(Gtk.Window):
     def on_button_press(self, widget, event):
         width, height = self.get_size()
         if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
-            import sys
-            sys.exit(0)
+            Gtk.main_quit()
+            return True
         return False
 
 if __name__ == "__main__":
