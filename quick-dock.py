@@ -326,6 +326,8 @@ class QuickDock(Gtk.Window):
                 return p['id']
             if "brave" in wm_class and "brave" in p['id'].lower():
                 return p['id']
+            if "terminal" in wm_class and "terminal" in p['id'].lower():
+                return p['id']
         return None
 
     def get_clean_name(self, raw_str):
