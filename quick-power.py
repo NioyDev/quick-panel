@@ -36,14 +36,20 @@ class QuickPower(Gtk.Window):
         lbl_title.set_markup("<span weight='bold' foreground='#fafafa' size='x-large'>Opciones del Sistema</span>")
         main_box.pack_start(lbl_title, False, False, 10)
         
-        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=30)
+        grid = Gtk.Grid(column_spacing=20, row_spacing=20)
+        grid.set_halign(Gtk.Align.CENTER)
         
-        btn_box.pack_start(self.make_action_btn("system-shutdown-symbolic", "Apagar", "systemctl poweroff"), False, False, 0)
-        btn_box.pack_start(self.make_action_btn("view-refresh-symbolic", "Reiniciar", "systemctl reboot"), False, False, 0)
-        btn_box.pack_start(self.make_action_btn("system-log-out-symbolic", "Cerrar Sesión", "pkill xfce4-session"), False, False, 0)
-        btn_box.pack_start(self.make_action_btn("system-users-symbolic", "Cambiar Perfil", "dm-tool switch-to-greeter"), False, False, 0)
+        btn_power = self.make_action_btn("system-shutdown-symbolic", "Apagar", "systemctl poweroff")
+        btn_restart = self.make_action_btn("view-refresh-symbolic", "Reiniciar", "systemctl reboot")
+        btn_logout = self.make_action_btn("system-log-out-symbolic", "Cerrar Sesión", "pkill xfce4-session")
+        btn_user = self.make_action_btn("system-users-symbolic", "Cambiar Perfil", "dm-tool switch-to-greeter")
         
-        main_box.pack_start(btn_box, False, False, 0)
+        grid.attach(btn_power, 0, 0, 1, 1)
+        grid.attach(btn_restart, 1, 0, 1, 1)
+        grid.attach(btn_logout, 0, 1, 1, 1)
+        grid.attach(btn_user, 1, 1, 1, 1)
+        
+        main_box.pack_start(grid, False, False, 0)
         
         self.add(main_box)
         self.show_all()
@@ -55,12 +61,10 @@ class QuickPower(Gtk.Window):
         btn = Gtk.Button()
         btn.set_name("power_btn")
         btn.set_can_focus(False)
+        btn.set_size_request(140, 140) # 1:1 aspect ratio
         
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        vbox.set_margin_top(30)
-        vbox.set_margin_bottom(30)
-        vbox.set_margin_start(30)
-        vbox.set_margin_end(30)
+        vbox.set_valign(Gtk.Align.CENTER)
         
         icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.DIALOG)
         icon.set_pixel_size(48)
@@ -88,14 +92,15 @@ class QuickPower(Gtk.Window):
 
     def setup_css(self):
         css = b"""
+        window { background-color: transparent; }
         #power_box {
-            background-color: rgba(20, 20, 20, 0.85);
+            background-color: #18181b;
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px;
+            padding: 30px;
         }
         #power_btn {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: #27272a;
             border-radius: 16px;
             border: 1px solid transparent;
             color: #fafafa;

@@ -80,10 +80,12 @@ class QuickBrightness(Gtk.Window):
 
     def setup_css(self):
         css = b"""
+        window { background-color: transparent; }
         #bright_box {
-            background-color: rgba(20, 20, 20, 0.85);
-            border-radius: 20px;
+            background-color: #18181b;
+            border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
         }
         scale trough {
             background-color: rgba(255, 255, 255, 0.2);

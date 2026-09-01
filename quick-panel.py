@@ -74,7 +74,7 @@ class QuickPanel(Gtk.Window):
         self.btn_vol = make_indicator()
         self.icon_vol = Gtk.Image.new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.MENU)
         self.btn_vol.add(self.icon_vol)
-        self.btn_vol.connect("clicked", lambda x: subprocess.Popen(["pavucontrol"]))
+        self.btn_vol.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-volume.py"]))
         self.main_box.pack_start(self.btn_vol, False, False, 0)
         
         self.btn_bright = make_indicator()
@@ -101,7 +101,7 @@ class QuickPanel(Gtk.Window):
         self.lbl_time = Gtk.Label()
         self.lbl_time.set_name("pill_label")
         self.btn_time.add(self.lbl_time)
-        self.btn_time.connect("clicked", lambda x: subprocess.Popen(["orage"]))
+        self.btn_time.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-calendar.py"]))
         self.main_box.pack_start(self.btn_time, False, False, 0)
         
         self.btn_power = make_indicator()
