@@ -58,12 +58,11 @@ class QuickPanel(Gtk.Window):
         self.scroll = Gtk.ScrolledWindow()
         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
         self.scroll.add(self.win_box)
-        # Pack the scroll window but DO NOT let it expand to fill everything
-        self.main_box.pack_start(self.scroll, False, False, 4)
+        # Pack the scroll window and let it expand to fill everything!
+        # This prevents apps from being squished and handles overflow gracefully.
+        self.main_box.pack_start(self.scroll, True, True, 4)
         
-        # --- CENTER (Spacer) ---
-        spacer = Gtk.Box()
-        self.main_box.pack_start(spacer, True, True, 0)
+        # --- RIGHT SIDE (Indicators) ---
         
         # --- RIGHT SIDE (Indicators) ---
         def make_indicator():
