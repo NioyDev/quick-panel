@@ -51,6 +51,10 @@ class QuickVolume(Gtk.Window):
         self.add(self.main_box)
         
         self.connect("focus-out-event", lambda *args: Gtk.main_quit())
+        self.connect("map-event", self.on_map)
+        self.connect("unmap-event", self.on_unmap)
+        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        self.connect("button-press-event", self.on_button_press)
         self.connect("key-press-event", self.on_key_press)
         
         GLib.idle_add(self.position_window)
@@ -117,6 +121,24 @@ class QuickVolume(Gtk.Window):
         provider.load_from_data(css)
         Gtk.StyleContext.add_provider_for_screen(
             Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+
+    def on_map(self, widget, event):
+        seat = Gdk.Display.get_default().get_default_seat()
+        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL_POINTING, True, None, None, None)
+        return False
+        
+    def on_unmap(self, widget, event):
+        seat = Gdk.Display.get_default().get_default_seat()
+        seat.ungrab()
+        return False
+
+    def on_button_press(self, widget, event):
+        width, height = self.get_size()
+        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+            import sys
+            sys.exit(0)
+        return False
 
 if __name__ == "__main__":
     app = QuickVolume()
