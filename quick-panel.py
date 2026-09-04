@@ -43,6 +43,7 @@ class QuickPanel(Gtk.Window):
         
         # --- CENTER (Launcher & Apps) ---
         self.center_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+        self.center_box.set_halign(Gtk.Align.CENTER)
         self.btn_launcher = Gtk.Button()
         self.btn_launcher.set_name("panel_btn")
         self.btn_launcher.set_can_focus(False)
@@ -58,10 +59,11 @@ class QuickPanel(Gtk.Window):
         self.win_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self.scroll = Gtk.ScrolledWindow()
         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
+        self.scroll.set_propagate_natural_width(True)
         self.scroll.add(self.win_box)
         self.center_box.pack_start(self.scroll, True, True, 4)
         
-        self.main_box.set_center_widget(self.center_box)
+        self.main_box.pack_start(self.center_box, False, False, 4)
         
         # --- RIGHT SIDE (Indicators) ---
         self.right_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
