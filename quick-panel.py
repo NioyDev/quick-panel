@@ -41,30 +41,31 @@ class QuickPanel(Gtk.Window):
         self.main_box.set_name("panel_box")
         self.main_box.set_margin_bottom(8)
         
-        # --- LEFT SIDE (Launcher & Apps) ---
+        # --- CENTER (Launcher & Apps) ---
+        self.center_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
         self.btn_launcher = Gtk.Button()
         self.btn_launcher.set_name("panel_btn")
         self.btn_launcher.set_can_focus(False)
         self.btn_launcher.connect("clicked", self.on_launcher_clicked)
         self.btn_launcher.add(Gtk.Image.new_from_icon_name("view-app-grid-symbolic", Gtk.IconSize.MENU))
-        self.main_box.pack_start(self.btn_launcher, False, False, 4)
+        self.center_box.pack_start(self.btn_launcher, False, False, 4)
         
         sep = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
         sep.set_margin_top(4)
         sep.set_margin_bottom(4)
-        self.main_box.pack_start(sep, False, False, 0)
+        self.center_box.pack_start(sep, False, False, 0)
         
         self.win_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self.scroll = Gtk.ScrolledWindow()
         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
         self.scroll.add(self.win_box)
-        # Pack the scroll window and let it expand to fill everything!
-        # This prevents apps from being squished and handles overflow gracefully.
-        self.main_box.pack_start(self.scroll, True, True, 4)
+        self.center_box.pack_start(self.scroll, True, True, 4)
+        
+        self.main_box.set_center_widget(self.center_box)
         
         # --- RIGHT SIDE (Indicators) ---
+        self.right_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         
-        # --- RIGHT SIDE (Indicators) ---
         def make_indicator():
             b = Gtk.Button()
             b.set_name("pill_item")
@@ -75,17 +76,17 @@ class QuickPanel(Gtk.Window):
         self.icon_vol = Gtk.Image.new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.MENU)
         self.btn_vol.add(self.icon_vol)
         self.btn_vol.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-volume.py"]))
-        self.main_box.pack_start(self.btn_vol, False, False, 0)
+        self.right_box.pack_start(self.btn_vol, False, False, 0)
         
         self.btn_bright = make_indicator()
         self.btn_bright.add(Gtk.Image.new_from_icon_name("display-brightness-symbolic", Gtk.IconSize.MENU))
         self.btn_bright.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-brightness.py"]))
-        self.main_box.pack_start(self.btn_bright, False, False, 0)
+        self.right_box.pack_start(self.btn_bright, False, False, 0)
         
         self.btn_wifi = make_indicator()
         self.btn_wifi.add(Gtk.Image.new_from_icon_name("network-wireless-symbolic", Gtk.IconSize.MENU))
         self.btn_wifi.connect("clicked", lambda x: subprocess.Popen(["nm-connection-editor"]))
-        self.main_box.pack_start(self.btn_wifi, False, False, 0)
+        self.right_box.pack_start(self.btn_wifi, False, False, 0)
         
         self.btn_bat = make_indicator()
         self.icon_bat = Gtk.Image.new_from_icon_name("battery-good-symbolic", Gtk.IconSize.MENU)
@@ -95,19 +96,21 @@ class QuickPanel(Gtk.Window):
         box_bat.pack_start(self.lbl_bat, False, False, 0)
         self.btn_bat.add(box_bat)
         self.btn_bat.connect("clicked", lambda x: subprocess.Popen(["xfce4-power-manager-settings"]))
-        self.main_box.pack_start(self.btn_bat, False, False, 0)
+        self.right_box.pack_start(self.btn_bat, False, False, 0)
         
         self.btn_time = make_indicator()
         self.lbl_time = Gtk.Label()
         self.lbl_time.set_name("pill_label")
         self.btn_time.add(self.lbl_time)
         self.btn_time.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-calendar.py"]))
-        self.main_box.pack_start(self.btn_time, False, False, 0)
+        self.right_box.pack_start(self.btn_time, False, False, 0)
         
         self.btn_power = make_indicator()
         self.btn_power.add(Gtk.Image.new_from_icon_name("system-shutdown-symbolic", Gtk.IconSize.MENU))
         self.btn_power.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-power.py"]))
-        self.main_box.pack_start(self.btn_power, False, False, 4)
+        self.right_box.pack_start(self.btn_power, False, False, 4)
+        
+        self.main_box.pack_end(self.right_box, False, False, 4)
         
         self.add(self.main_box)
         
@@ -489,8 +492,8 @@ class QuickPanel(Gtk.Window):
         self.set_size_request(target_width, -1)
         
         width, height = self.get_size()
-        x = 16
-        self.base_y = geometry.height - height
+        x = geometry.x + 16
+        self.base_y = geometry.y + geometry.height - height
         
         if self.current_y == 0:
             self.current_y = self.base_y
