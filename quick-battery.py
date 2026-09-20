@@ -76,7 +76,7 @@ class QuickBattery(Gtk.Window):
         
         # Activar fondo transparente (Glassmorphism)
         visual = self.get_screen().get_rgba_visual()
-        if visual and self.get_screen().is_composited():
+        if visual:
             self.set_visual(visual)
         
         self.provider = Gtk.CssProvider()
