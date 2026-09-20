@@ -32,7 +32,7 @@ class QuickPanel(Gtk.Window):
         
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
-        if visual and screen.is_composited():
+        if visual:
             self.set_visual(visual)
             
         self.setup_css()
@@ -63,7 +63,7 @@ class QuickPanel(Gtk.Window):
         self.scroll.add(self.win_box)
         self.center_box.pack_start(self.scroll, True, True, 4)
         
-        self.main_box.pack_start(self.center_box, False, False, 4)
+        self.main_box.set_center_widget(self.center_box)
         
         # --- RIGHT SIDE (Indicators) ---
         self.right_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
@@ -138,7 +138,7 @@ class QuickPanel(Gtk.Window):
         GLib.idle_add(lambda: self.on_active_window_changed(self.wnck_screen, None) or False)
         GLib.timeout_add(1000, self.enforce_visibility)
         
-        GLib.timeout_add_seconds(1, self.update_status)
+        GLib.timeout_add_seconds(5, self.update_status)
         self.update_status()
         
         GLib.idle_add(self.refresh_windows)
@@ -500,6 +500,7 @@ class QuickPanel(Gtk.Window):
         if self.current_y == 0:
             self.current_y = self.base_y
             self.move(x, self.base_y)
+            self.resize(target_width, height)
             
         return False
 
