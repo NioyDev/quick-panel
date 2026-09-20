@@ -13,6 +13,7 @@ class WifiPasswordDialog(Gtk.Dialog):
     def __init__(self, parent, ssid):
         super().__init__(title=f"Contraseña para {ssid}", transient_for=parent, flags=0)
         self.set_decorated(False)
+        self.set_modal(True)
         self.set_default_size(300, 150)
         self.set_border_width(16)
         
@@ -296,8 +297,10 @@ class QuickWifi(Gtk.Window):
         self.list_box.show_all()
 
     def show_timer_dialog(self, btn, ssid):
+        self.release_grab()
         dialog = Gtk.Dialog(title="Temporizador", transient_for=self, flags=0)
         dialog.set_decorated(False)
+        dialog.set_modal(True)
         dialog.set_border_width(16)
         box = dialog.get_content_area()
         box.set_spacing(12)
@@ -343,8 +346,10 @@ class QuickWifi(Gtk.Window):
             img_path = "/tmp/wifi_qr.png"
             img.save(img_path)
             
+            self.release_grab()
             dialog = Gtk.Dialog(title="Escanear para conectar", transient_for=self, flags=0)
             dialog.set_decorated(False)
+            dialog.set_modal(True)
             dialog.set_border_width(16)
             box = dialog.get_content_area()
             
@@ -383,6 +388,7 @@ class QuickWifi(Gtk.Window):
         threading.Thread(target=worker).start()
 
     def ask_password_and_connect(self, ssid, bssid):
+        self.release_grab()
         dialog = WifiPasswordDialog(self, ssid)
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
@@ -404,8 +410,14 @@ class QuickWifi(Gtk.Window):
             GLib.idle_add(self.scan_networks)
         threading.Thread(target=worker).start()
 
+    def release_grab(self):
+        seat = Gdk.Display.get_default().get_default_seat()
+        seat.ungrab()
+
     def show_error(self, message):
+        self.release_grab()
         dialog = Gtk.MessageDialog(transient_for=self, flags=0, message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK, text=message)
+        dialog.set_modal(True)
         dialog.run()
         dialog.destroy()
 
