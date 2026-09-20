@@ -162,7 +162,6 @@ class QuickPanel(Gtk.Window):
             background-color: #18181b;
             border-radius: 20px;
             border: 1px solid #27272a;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             padding: 4px;
         }
         #panel_btn, #pill_item {
