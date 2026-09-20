@@ -80,6 +80,11 @@ class QuickPanel(Gtk.Window):
         self.btn_vol.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-volume.py"]))
         self.right_box.pack_start(self.btn_vol, False, False, 0)
         
+        self.btn_bt = make_indicator()
+        self.btn_bt.add(Gtk.Image.new_from_icon_name("bluetooth-active-symbolic", Gtk.IconSize.MENU))
+        self.btn_bt.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-bluetooth.py"]))
+        self.right_box.pack_start(self.btn_bt, False, False, 0)
+        
         self.btn_bright = make_indicator()
         self.btn_bright.add(Gtk.Image.new_from_icon_name("display-brightness-symbolic", Gtk.IconSize.MENU))
         self.btn_bright.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-brightness.py"]))
