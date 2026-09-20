@@ -62,7 +62,7 @@ class QuickToggle(Gtk.Box):
 
 class QuickSettingsPanel(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.POPUP)
+        super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
         self.set_type_hint(Gdk.WindowTypeHint.DROPDOWN_MENU)
         self.set_skip_taskbar_hint(True)
@@ -291,11 +291,13 @@ class QuickSettingsPanel(Gtk.Window):
             font-family: system-ui, sans-serif;
         }
         
-        window { 
+        window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } 
             background-color: transparent; 
         }
         
         #main_window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
             background-color: #09090b; /* Zinc 950 */
             border-radius: 28px;
             border: 1px solid #27272a;

@@ -65,7 +65,7 @@ decoration, decoration:backdrop {
 
 class QuickBattery(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.POPUP)
+        super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_default_size(320, -1)
         
         screen = Gdk.Screen.get_default()

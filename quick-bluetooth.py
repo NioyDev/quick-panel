@@ -8,7 +8,7 @@ from gi.repository import Gtk, Gdk, GLib, Pango
 
 class QuickBluetooth(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.POPUP)
+        super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
@@ -166,7 +166,9 @@ class QuickBluetooth(Gtk.Window):
     def setup_css(self):
         css = b'''
                 * { outline: none; }
-        window { background-color: transparent; }
+        window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #bluetooth_box {
             background-color: #18181b;
             border-radius: 20px;

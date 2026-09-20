@@ -28,7 +28,7 @@ CATEGORIES = {
 
 class QuickLauncher(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.POPUP)
+        super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
         self.set_keep_above(True)
         self.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
@@ -104,11 +104,16 @@ class QuickLauncher(Gtk.Window):
         
     def setup_css(self):
         css = b'''
-                * {
+        * {
             outline: none;
         }
         window {
             background-color: transparent;
+        }
+        decoration, decoration:backdrop {
+            box-shadow: none;
+            background-color: transparent;
+            border: none;
         }
         #launcher_box {
             background-color: rgba(24, 24, 27, 0.95);

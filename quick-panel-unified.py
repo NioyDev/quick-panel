@@ -185,7 +185,9 @@ class QuickVolume(BasePopup):
     def setup_css(self):
         css = b'''
                 * { outline: none; }
-        window { background-color: transparent; }
+        window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #volume_box {
             background-color: #18181b;
             border-radius: 20px;
@@ -248,7 +250,9 @@ class QuickBrightness(BasePopup):
 
     def setup_css(self):
         css = b'''
-                window { background-color: transparent; }
+                window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #bright_box {
             background-color: #18181b;
             border-radius: 24px;
@@ -316,7 +320,9 @@ class QuickCalendar(BasePopup):
     def setup_css(self):
         css = b'''
                 * { outline: none; color: #fafafa; }
-        window { background-color: transparent; }
+        window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #cal_box {
             background-color: #18181b;
             border-radius: 20px;
@@ -397,7 +403,9 @@ class QuickPower(BasePopup):
 
     def setup_css(self):
         css = b'''
-                window { background-color: transparent; }
+                window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #power_box {
             background-color: #18181b;
             border-radius: 24px;
@@ -547,7 +555,9 @@ class QuickLauncher(BasePopup):
     def setup_css(self):
         css = b'''
                 * { outline: none; }
-        window { background-color: transparent; }
+        window {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #launcher_box {
             background-color: rgba(24, 24, 27, 0.95);
             border-radius: 24px;
@@ -570,7 +580,9 @@ class QuickLauncher(BasePopup):
         #app_btn { background-color: transparent; border: none; border-radius: 16px; padding: 12px 8px; transition: all 200ms ease; }
         #app_btn:hover { background-color: rgba(255, 255, 255, 0.08); }
         #app_label { color: #fafafa; font-size: 12px; margin-top: 10px; }
-        scrolledwindow { background-color: transparent; }
+        scrolledwindow {
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         viewport { background-color: transparent; }
         '''
         provider = Gtk.CssProvider()
@@ -580,7 +592,7 @@ class QuickLauncher(BasePopup):
 
 class QuickPanel(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.POPUP)
+        super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_title("QuickPanel")
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)

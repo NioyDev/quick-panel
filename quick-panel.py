@@ -20,7 +20,7 @@ PINNED_APPS = [
 
 class QuickPanel(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.POPUP)
+        super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_title("QuickPanel")
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
