@@ -76,28 +76,16 @@ echo "Quick Panel iniciado (PID: $!)"
 LAUNCHER_EOF
 chmod +x ~/.local/bin/start-quick-panel.sh
 
-# 5. Configurar el inicio automático
-echo "🔁 Configurando inicio automático..."
-cat > ~/.config/autostart/quick-panel.desktop << 'AUTOSTART_EOF'
-[Desktop Entry]
-Type=Application
-Name=Quick Panel
-Comment=Panel rápido premium para XFCE con transparencia
-Exec=/home/$USER/.local/bin/start-quick-panel.sh
-Terminal=false
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-AUTOSTART_EOF
-
-# Reemplazar $USER por el usuario real
-sed -i "s|\$USER|$(whoami)|g" ~/.config/autostart/quick-panel.desktop
-
-# 6. Iniciar el panel ahora mismo
-echo "✨ Encendiendo el nuevo panel..."
-bash ~/.local/bin/start-quick-panel.sh
+# 5. Instalar servicio systemd (se reinicia solo si el panel muere)
+echo "🔁 Instalando servicio del sistema..."
+mkdir -p ~/.config/systemd/user
+cp quick-panel.service ~/.config/systemd/user/quick-panel.service
+systemctl --user daemon-reload
+systemctl --user enable quick-panel.service
+systemctl --user restart quick-panel.service
 
 echo ""
 echo "🎉 ¡Instalación completa!"
 echo "   Tu entorno premium Quick Panel está activo."
 echo "   Se iniciará automáticamente en cada arranque."
+echo "   Si alguna vez se cierra solo, se reiniciará en 3 segundos."
