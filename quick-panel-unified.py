@@ -29,6 +29,12 @@ CATEGORIES = {
 }
 
 class PopupManager:
+        def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self):
         self.active_popup = None
         self.timeout_id = None
@@ -921,9 +927,3 @@ if __name__ == "__main__":
     app = QuickPanel()
     app.show_all()
     Gtk.main()
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False

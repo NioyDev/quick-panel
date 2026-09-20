@@ -72,6 +72,12 @@ class WifiPasswordDialog(Gtk.Dialog):
         return False
 
 class QuickWifi(Gtk.Window):
+        def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
@@ -607,9 +613,3 @@ if __name__ == "__main__":
     app = QuickWifi()
     app.show_all()
     Gtk.main()
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False

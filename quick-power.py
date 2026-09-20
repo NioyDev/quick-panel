@@ -6,6 +6,12 @@ import sys
 import cairo
 
 class QuickPower(Gtk.Window):
+        def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
@@ -143,12 +149,6 @@ class QuickPower(Gtk.Window):
         if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
             Gtk.main_quit()
             return True
-        return False
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
         return False
 
 if __name__ == '__main__':
