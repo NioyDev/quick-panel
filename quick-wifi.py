@@ -592,10 +592,8 @@ class QuickWifi(Gtk.Window):
             self.active_dialog.response(Gtk.ResponseType.CANCEL)
             return True
             
-        x, y = self.get_position()
-        w, h = self.get_size()
-        _, root_x, root_y = event.get_root_coords()
-        if root_x < x or root_x > x + w or root_y < y or root_y > y + h:
+        width, height = self.get_size()
+        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
             Gtk.main_quit()
             return True
         return False
