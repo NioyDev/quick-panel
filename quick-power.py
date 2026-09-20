@@ -12,7 +12,6 @@ class QuickPower(Gtk.Window):
         self.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
-        self.set_app_paintable(True)
         self.set_position(Gtk.WindowPosition.CENTER)
         
         screen = self.get_screen()

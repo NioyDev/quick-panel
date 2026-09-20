@@ -100,7 +100,6 @@ class BasePopup(Gtk.Window):
         self.set_skip_pager_hint(True)
         self.set_keep_above(True)
         self.set_accept_focus(True)
-        self.set_app_paintable(True)
         
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
@@ -589,7 +588,6 @@ class QuickPanel(Gtk.Window):
         self.set_keep_above(True)
         self.set_type_hint(Gdk.WindowTypeHint.DOCK)
         self.set_accept_focus(False)
-        self.set_app_paintable(True)
         
         screen = self.get_screen()
         visual = screen.get_rgba_visual()

@@ -73,7 +73,6 @@ class QuickBattery(Gtk.Window):
         self.move(monitor.width - 340, monitor.height - 450)
         
         self.set_decorated(False)
-        self.set_app_paintable(True)
         
         # Activar fondo transparente (Glassmorphism)
         visual = self.get_screen().get_rgba_visual()
