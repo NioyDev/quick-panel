@@ -1,21 +1,12 @@
 #!/usr/bin/env python3
 import gi
-import cairo
 import datetime
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 class QuickCalendar(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
@@ -23,12 +14,10 @@ class QuickCalendar(Gtk.Window):
         
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
-        if visual:
+        if visual and screen.is_composited():
             self.set_visual(visual)
-            self.set_app_paintable(True)
             
         self.setup_css()
-        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         self.main_box.set_name("cal_box")
@@ -93,10 +82,8 @@ class QuickCalendar(Gtk.Window):
 
     def setup_css(self):
         css = b'''
-                * { outline: none; color: #fafafa; }
+        * { outline: none; color: #fafafa; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-
         #cal_box {
             background-color: #18181b;
             border-radius: 20px;

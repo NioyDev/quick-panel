@@ -1,23 +1,14 @@
 #!/usr/bin/env python3
 import gi
 import subprocess
-import cairo
 import threading
 gi.require_version('Gtk', '3.0')
 gi.require_version('Pango', '1.0')
 from gi.repository import Gtk, Gdk, GLib, Pango
 
 class QuickBluetooth(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
@@ -27,10 +18,8 @@ class QuickBluetooth(Gtk.Window):
         visual = screen.get_rgba_visual()
         if visual:
             self.set_visual(visual)
-            self.set_app_paintable(True)
             
         self.setup_css()
-        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         self.main_box.set_name("bluetooth_box")
@@ -176,10 +165,8 @@ class QuickBluetooth(Gtk.Window):
 
     def setup_css(self):
         css = b'''
-                * { outline: none; }
+        * { outline: none; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-
         #bluetooth_box {
             background-color: #18181b;
             border-radius: 20px;

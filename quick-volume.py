@@ -1,22 +1,13 @@
 #!/usr/bin/env python3
 import gi
 import subprocess
-import cairo
 import re
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 class QuickVolume(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
@@ -26,10 +17,8 @@ class QuickVolume(Gtk.Window):
         visual = screen.get_rgba_visual()
         if visual:
             self.set_visual(visual)
-            self.set_app_paintable(True)
             
         self.setup_css()
-        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         self.main_box.set_name("volume_box")
@@ -195,10 +184,8 @@ class QuickVolume(Gtk.Window):
 
     def setup_css(self):
         css = b'''
-                * { outline: none; }
+        * { outline: none; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-
         #volume_box {
             background-color: #18181b;
             border-radius: 20px;

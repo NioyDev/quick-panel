@@ -2,19 +2,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 import subprocess
-import cairo
 import sys
 import os
 
 class QuickBrightness(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
@@ -22,6 +13,7 @@ class QuickBrightness(Gtk.Window):
         self.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
+        self.set_app_paintable(True)
         
         # Position near the pill widget (bottom right)
         display = Gdk.Display.get_default()
@@ -33,12 +25,10 @@ class QuickBrightness(Gtk.Window):
         
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
-        if visual:
+        if visual and screen.is_composited():
             self.set_visual(visual)
-            self.set_app_paintable(True)
             
         self.setup_css()
-        self.connect("draw", self.on_draw)
         
         self.connect("key-press-event", self.on_key_press)
         self.connect("focus-out-event", self.on_focus_out)
@@ -94,9 +84,7 @@ class QuickBrightness(Gtk.Window):
 
     def setup_css(self):
         css = b"""
-                window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-
+        window { background-color: transparent; }
         #bright_box {
             background-color: #18181b;
             border-radius: 24px;
@@ -144,7 +132,6 @@ class QuickBrightness(Gtk.Window):
             Gtk.main_quit()
             return True
         return False
-
 
 if __name__ == '__main__':
     win = QuickBrightness()

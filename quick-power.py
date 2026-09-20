@@ -3,17 +3,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 import subprocess
 import sys
-import cairo
 
 class QuickPower(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
@@ -21,17 +12,16 @@ class QuickPower(Gtk.Window):
         self.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
+        self.set_app_paintable(True)
         self.set_position(Gtk.WindowPosition.CENTER)
         
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
-        if visual:
+        if visual and screen.is_composited():
             self.set_visual(visual)
-            self.set_app_paintable(True)
             
         self.setup_css()
         
-        self.connect("draw", self.on_draw)
         self.connect("key-press-event", self.on_key_press)
         self.connect("focus-out-event", self.on_focus_out)
         self.connect("map-event", self.on_map)
@@ -107,8 +97,6 @@ class QuickPower(Gtk.Window):
     def setup_css(self):
         css = b"""
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-
         #power_box {
             background-color: #18181b;
             border-radius: 24px;

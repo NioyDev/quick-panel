@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import gi
 import subprocess
-import cairo
 import threading
 import time
 import os
@@ -11,13 +10,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, Pango
 
 class WifiPasswordDialog(Gtk.Dialog):
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self, parent, ssid):
         super().__init__(title=f"Contraseña para {ssid}", transient_for=parent, flags=0)
         self.set_decorated(False)
@@ -79,16 +71,8 @@ class WifiPasswordDialog(Gtk.Dialog):
         return False
 
 class QuickWifi(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
@@ -98,10 +82,8 @@ class QuickWifi(Gtk.Window):
         visual = screen.get_rgba_visual()
         if visual:
             self.set_visual(visual)
-            self.set_app_paintable(True)
             
         self.setup_css()
-        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         self.main_box.set_name("wifi_box")
@@ -550,9 +532,7 @@ class QuickWifi(Gtk.Window):
         css = b'''
         * { outline: none; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-
-                #wifi_box {
+        #wifi_box {
             background-color: #18181b;
             border-radius: 20px;
             border: 1px solid #27272a;

@@ -2,15 +2,14 @@
 import gi
 import os
 import subprocess
-import cairo
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, Pango
 
 CSS = """
-window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-
+window {
+    background-color: transparent;
+}
 #main_box {
     background-color: #18181b;
     border-radius: 20px;
@@ -61,20 +60,8 @@ window { background-color: transparent; }
 """
 
 class QuickBattery(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
-        self.set_keep_above(True)
-        self.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
-        self.set_skip_taskbar_hint(True)
-        self.set_skip_pager_hint(True)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_default_size(320, -1)
         
         screen = Gdk.Screen.get_default()
@@ -82,12 +69,12 @@ class QuickBattery(Gtk.Window):
         self.move(monitor.width - 340, monitor.height - 450)
         
         self.set_decorated(False)
+        self.set_app_paintable(True)
         
         # Activar fondo transparente (Glassmorphism)
         visual = self.get_screen().get_rgba_visual()
-        if visual:
+        if visual and self.get_screen().is_composited():
             self.set_visual(visual)
-            self.set_app_paintable(True)
         
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(CSS.encode())

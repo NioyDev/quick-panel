@@ -2,7 +2,6 @@
 import gi
 import sys
 import subprocess
-import cairo
 import time
 import os
 import datetime
@@ -20,14 +19,6 @@ PINNED_APPS = [
 ]
 
 class QuickPanel(Gtk.Window):
-
-
-    def on_draw(self, widget, cr):
-        cr.set_source_rgba(0, 0, 0, 0)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        return False
-
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_title("QuickPanel")
@@ -37,15 +28,14 @@ class QuickPanel(Gtk.Window):
         self.set_keep_above(True)
         self.set_type_hint(Gdk.WindowTypeHint.DOCK)
         self.set_accept_focus(False)
+        self.set_app_paintable(True)
         
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
         if visual:
             self.set_visual(visual)
-            self.set_app_paintable(True)
             
         self.setup_css()
-        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
         self.main_box.set_name("panel_box")
@@ -174,7 +164,7 @@ class QuickPanel(Gtk.Window):
         css = b'''
         * { outline: none; font-family: system-ui, sans-serif; }
         window, scrolledwindow, viewport { background-color: transparent; }
-                #panel_box {
+        #panel_box {
             background-color: #18181b;
             border-radius: 20px;
             border: 1px solid #27272a;
