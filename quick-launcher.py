@@ -41,6 +41,7 @@ class QuickLauncher(Gtk.Window):
         visual = screen.get_rgba_visual()
         if visual:
             self.set_visual(visual)
+            self.set_app_paintable(True)
             
         self.setup_css()
         

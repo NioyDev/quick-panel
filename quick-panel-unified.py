@@ -105,6 +105,7 @@ class BasePopup(Gtk.Window):
         visual = screen.get_rgba_visual()
         if visual:
             self.set_visual(visual)
+            self.set_app_paintable(True)
             
         self.connect("focus-out-event", self.on_focus_out)
         self.connect("key-press-event", self.on_key_press)

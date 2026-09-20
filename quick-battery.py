@@ -78,6 +78,7 @@ class QuickBattery(Gtk.Window):
         visual = self.get_screen().get_rgba_visual()
         if visual:
             self.set_visual(visual)
+            self.set_app_paintable(True)
         
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(CSS.encode())
