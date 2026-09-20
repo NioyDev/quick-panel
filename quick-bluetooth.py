@@ -56,7 +56,7 @@ class QuickBluetooth(Gtk.Window):
         self.bt_list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         self.bt_scroll.add(self.bt_list_box)
         self.main_box.pack_start(self.bt_scroll, True, True, 0)
-        self.main_box.set_size_request(380, 270)
+        self.main_box.set_size_request(450, 270)
         
         self.add(self.main_box)
         
@@ -157,7 +157,7 @@ class QuickBluetooth(Gtk.Window):
     def position_window(self):
         geometry = Gdk.Display.get_default().get_primary_monitor().get_geometry()
         width, height = self.get_size()
-        x = geometry.width - width - 240 # Shift slightly left from volume
+        x = geometry.width - width - 200
         y = geometry.height - height - 60
         self.move(x, y)
         self.present()
@@ -171,7 +171,7 @@ class QuickBluetooth(Gtk.Window):
             background-color: #18181b;
             border-radius: 20px;
             border: 1px solid #27272a;
-            padding: 24px;
+            padding: 16px;
         }
         image { color: #fafafa; }
         #bt_label {
