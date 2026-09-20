@@ -103,7 +103,7 @@ class QuickPanel(Gtk.Window):
         box_bat.pack_start(self.icon_bat, False, False, 0)
         box_bat.pack_start(self.lbl_bat, False, False, 0)
         self.btn_bat.add(box_bat)
-        self.btn_bat.connect("clicked", lambda x: subprocess.Popen(["xfce4-power-manager-settings"]))
+        self.btn_bat.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-battery.py"]))
         self.right_box.pack_start(self.btn_bat, False, False, 0)
         
         self.btn_time = make_indicator()
@@ -434,6 +434,15 @@ class QuickPanel(Gtk.Window):
                 else: icon_name = "battery-full-symbolic"
             self.icon_bat.set_from_icon_name(icon_name, Gtk.IconSize.MENU)
             self.lbl_bat.set_markup(f"<span weight='bold' foreground='#fafafa' size='medium'>{pct}%</span>")
+            
+            # Auto-dimming logic
+            if pct <= 20 and state == "discharging":
+                if not getattr(self, "battery_dimmed", False):
+                    subprocess.run(["brightnessctl", "s", "10%"])
+                    self.battery_dimmed = True
+            elif state == "charging" or pct > 20:
+                self.battery_dimmed = False
+                
         except: pass
         return True
 
