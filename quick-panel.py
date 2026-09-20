@@ -164,6 +164,7 @@ class QuickPanel(Gtk.Window):
         css = b'''
         * { outline: none; font-family: system-ui, sans-serif; }
         window, scrolledwindow, viewport { background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; }
         #panel_box {
             background-color: #18181b;
             border-radius: 20px;
