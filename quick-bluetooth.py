@@ -166,7 +166,7 @@ class QuickBluetooth(Gtk.Window):
     def setup_css(self):
         css = b'''
                 * { outline: none; }
-        window {
+        window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #bluetooth_box {

@@ -291,12 +291,12 @@ class QuickSettingsPanel(Gtk.Window):
             font-family: system-ui, sans-serif;
         }
         
-        window {
+        window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } 
             background-color: transparent; 
         }
         
-        #main_window {
+        #main_window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
             background-color: #09090b; /* Zinc 950 */
             border-radius: 28px;

@@ -185,7 +185,7 @@ class QuickVolume(BasePopup):
     def setup_css(self):
         css = b'''
                 * { outline: none; }
-        window {
+        window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #volume_box {
@@ -250,7 +250,7 @@ class QuickBrightness(BasePopup):
 
     def setup_css(self):
         css = b'''
-                window {
+                window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #bright_box {
@@ -320,7 +320,7 @@ class QuickCalendar(BasePopup):
     def setup_css(self):
         css = b'''
                 * { outline: none; color: #fafafa; }
-        window {
+        window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #cal_box {
@@ -403,7 +403,7 @@ class QuickPower(BasePopup):
 
     def setup_css(self):
         css = b'''
-                window {
+                window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #power_box {
@@ -555,7 +555,7 @@ class QuickLauncher(BasePopup):
     def setup_css(self):
         css = b'''
                 * { outline: none; }
-        window {
+        window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #launcher_box {
@@ -580,7 +580,7 @@ class QuickLauncher(BasePopup):
         #app_btn { background-color: transparent; border: none; border-radius: 16px; padding: 12px 8px; transition: all 200ms ease; }
         #app_btn:hover { background-color: rgba(255, 255, 255, 0.08); }
         #app_label { color: #fafafa; font-size: 12px; margin-top: 10px; }
-        scrolledwindow {
+        scrolledwindow { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         viewport { background-color: transparent; }

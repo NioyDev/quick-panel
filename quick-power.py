@@ -95,7 +95,7 @@ class QuickPower(Gtk.Window):
 
     def setup_css(self):
         css = b"""
-        window {
+        window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         #power_box {
