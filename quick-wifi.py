@@ -112,7 +112,7 @@ class QuickWifi(Gtk.Window):
         self.scroll.set_min_content_height(350)
         
         self.list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        self.scroll.add(self.list_box)
+        self.scroll.add_with_viewport(self.list_box)
         self.main_box.pack_start(self.scroll, True, True, 0)
         
         self.add(self.main_box)
@@ -210,7 +210,7 @@ class QuickWifi(Gtk.Window):
                     bssid = parts[2].replace("|||", ":")
                     signal = parts[3]
                     security = parts[4]
-                    freq_str = parts[5].replace(" MHz", "")
+                    freq_str = parts[5].replace(" MHz", "").strip()
                     band = "5G" if freq_str.isdigit() and int(freq_str) > 4000 else "2.4G"
                     
                     if ssid and (ssid, band) not in seen_ssids:
