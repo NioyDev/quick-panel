@@ -138,7 +138,7 @@ class QuickWifi(Gtk.Window):
     def get_wifi_interface(self):
         try:
             out = subprocess.check_output("nmcli -t -f DEVICE,TYPE dev", shell=True).decode()
-            for line in out.split('\\n'):
+            for line in out.split('\n'):
                 if ':wifi' in line:
                     return line.split(':')[0]
         except: pass
@@ -184,7 +184,7 @@ class QuickWifi(Gtk.Window):
         
         try:
             out = subprocess.check_output("LC_ALL=C nmcli -t -f NAME con show", shell=True).decode()
-            self.saved_connections = [line.strip() for line in out.split('\\n') if line.strip()]
+            self.saved_connections = [line.strip() for line in out.split('\n') if line.strip()]
         except: pass
         
         threading.Thread(target=self.scan_networks).start()
@@ -199,9 +199,9 @@ class QuickWifi(Gtk.Window):
             out = subprocess.check_output("LC_ALL=C nmcli -t -e yes -f ACTIVE,SSID,BSSID,SIGNAL,SECURITY,FREQ dev wifi", shell=True).decode()
             networks = []
             seen_ssids = set()
-            for line in out.split('\\n'):
+            for line in out.split('\n'):
                 if not line.strip(): continue
-                line = line.replace("\\\\:", "|||")
+                line = line.replace("\\:", "|||")
                 parts = line.split(":")
                 if len(parts) >= 6:
                     active = parts[0] == "yes"
