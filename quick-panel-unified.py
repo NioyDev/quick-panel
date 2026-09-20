@@ -2,6 +2,7 @@
 import gi
 import sys
 import subprocess
+import cairo
 import time
 import os
 import datetime
@@ -126,6 +127,7 @@ class QuickVolume(BasePopup):
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
+        self.connect("draw", self.on_draw)
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         self.main_box.set_name("volume_box")
         
@@ -210,6 +212,7 @@ class QuickBrightness(BasePopup):
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
         self.main_box.set_name("bright_box")
@@ -273,6 +276,7 @@ class QuickCalendar(BasePopup):
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         self.main_box.set_name("cal_box")
@@ -345,6 +349,7 @@ class QuickPower(BasePopup):
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         main_box.set_name("power_box")
@@ -435,6 +440,7 @@ class QuickLauncher(BasePopup):
         super().__init__(manager)
         self.set_default_size(650, 500)
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
         self.main_box.set_name("launcher_box")
@@ -915,3 +921,9 @@ if __name__ == "__main__":
     app = QuickPanel()
     app.show_all()
     Gtk.main()
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False

@@ -2,6 +2,7 @@
 import gi
 import sys
 import subprocess
+import cairo
 import time
 import os
 import datetime
@@ -36,6 +37,7 @@ class QuickPanel(Gtk.Window):
             self.set_app_paintable(True)
             
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
         self.main_box.set_name("panel_box")
@@ -522,3 +524,9 @@ if __name__ == "__main__":
     app = QuickPanel()
     app.show_all()
     Gtk.main()
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False

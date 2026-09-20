@@ -2,6 +2,7 @@ import gi
 import sys
 import os
 import subprocess
+import cairo
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Gio
 
@@ -44,6 +45,7 @@ class QuickLauncher(Gtk.Window):
             self.set_app_paintable(True)
             
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         self.connect("key-press-event", self.on_key_press)
         self.connect("focus-out-event", self.on_focus_out)
@@ -276,3 +278,9 @@ if __name__ == "__main__":
     app = QuickLauncher()
     app.show_all()
     Gtk.main()
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False

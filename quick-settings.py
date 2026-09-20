@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import gi
 import subprocess
+import cairo
 import os
 import datetime
 gi.require_version('Gtk', '3.0')
@@ -80,6 +81,7 @@ class QuickSettingsPanel(Gtk.Window):
             self.set_app_paintable(True)
 
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         # Contenedor principal
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
@@ -377,6 +379,13 @@ class QuickSettingsPanel(Gtk.Window):
         Gtk.StyleContext.add_provider_for_screen(
             Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
+
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
 
 if __name__ == '__main__':
     win = QuickSettingsPanel()

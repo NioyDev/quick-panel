@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import gi
+import cairo
 import datetime
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
@@ -19,6 +20,7 @@ class QuickCalendar(Gtk.Window):
             self.set_app_paintable(True)
             
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         self.main_box.set_name("cal_box")
@@ -137,3 +139,9 @@ if __name__ == "__main__":
     app = QuickCalendar()
     app.show_all()
     Gtk.main()
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False

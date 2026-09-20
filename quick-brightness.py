@@ -2,6 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 import subprocess
+import cairo
 import sys
 import os
 
@@ -29,6 +30,7 @@ class QuickBrightness(Gtk.Window):
             self.set_app_paintable(True)
             
         self.setup_css()
+        self.connect("draw", self.on_draw)
         
         self.connect("key-press-event", self.on_key_press)
         self.connect("focus-out-event", self.on_focus_out)
@@ -133,6 +135,13 @@ class QuickBrightness(Gtk.Window):
         if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
             Gtk.main_quit()
             return True
+        return False
+
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
         return False
 
 if __name__ == '__main__':
