@@ -7,13 +7,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, Pango
 
 CSS = """
-window {
-    background-color: transparent;
-}
-decoration, decoration:backdrop {
-    box-shadow: none;
-    background-color: transparent;
-}
+window { background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
 #main_box {
     background-color: #18181b;
     border-radius: 20px;

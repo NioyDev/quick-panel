@@ -186,8 +186,8 @@ class QuickVolume(BasePopup):
         css = b'''
                 * { outline: none; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
         #volume_box {
             background-color: #18181b;
             border-radius: 20px;
@@ -251,8 +251,8 @@ class QuickBrightness(BasePopup):
     def setup_css(self):
         css = b'''
                 window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
         #bright_box {
             background-color: #18181b;
             border-radius: 24px;
@@ -321,8 +321,8 @@ class QuickCalendar(BasePopup):
         css = b'''
                 * { outline: none; color: #fafafa; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
         #cal_box {
             background-color: #18181b;
             border-radius: 20px;
@@ -404,8 +404,8 @@ class QuickPower(BasePopup):
     def setup_css(self):
         css = b'''
                 window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
         #power_box {
             background-color: #18181b;
             border-radius: 24px;
@@ -556,8 +556,8 @@ class QuickLauncher(BasePopup):
         css = b'''
                 * { outline: none; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
         #launcher_box {
             background-color: rgba(24, 24, 27, 0.95);
             border-radius: 24px;
@@ -581,144 +581,8 @@ class QuickLauncher(BasePopup):
         #app_btn:hover { background-color: rgba(255, 255, 255, 0.08); }
         #app_label { color: #fafafa; font-size: 12px; margin-top: 10px; }
         scrolledwindow { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        viewport { background-color: transparent; }
-        '''
-        provider = Gtk.CssProvider()
-        provider.load_from_data(css)
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-
-class QuickPanel(Gtk.Window):
-    def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
-        self.set_title("QuickPanel")
-        self.set_decorated(False)
-        self.set_skip_taskbar_hint(True)
-        self.set_skip_pager_hint(True)
-        self.set_keep_above(True)
-        self.set_type_hint(Gdk.WindowTypeHint.DOCK)
-        self.set_accept_focus(False)
-        
-        screen = self.get_screen()
-        visual = screen.get_rgba_visual()
-        if visual:
-            self.set_visual(visual)
-            
-        self.setup_css()
-        
-        self.popup_manager = PopupManager()
-        self.popup_manager.init_popups()
-        
-        self.main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.main_box.set_name("panel_box")
-        self.main_box.set_margin_bottom(8)
-        
-        self.btn_launcher = Gtk.Button()
-        self.btn_launcher.set_name("panel_btn")
-        self.btn_launcher.set_can_focus(False)
-        self.btn_launcher.connect("clicked", lambda w: self.popup_manager.toggle('launcher'))
-        self.btn_launcher.add(Gtk.Image.new_from_icon_name("view-app-grid-symbolic", Gtk.IconSize.MENU))
-        self.main_box.pack_start(self.btn_launcher, False, False, 4)
-        
-        sep = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        sep.set_margin_top(4)
-        sep.set_margin_bottom(4)
-        self.main_box.pack_start(sep, False, False, 0)
-        
-        self.win_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        self.scroll = Gtk.ScrolledWindow()
-        self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
-        self.scroll.add(self.win_box)
-        self.main_box.pack_start(self.scroll, True, True, 4)
-        
-        def make_indicator():
-            b = Gtk.Button()
-            b.set_name("pill_item")
-            b.set_can_focus(False)
-            return b
-            
-        self.btn_vol = make_indicator()
-        self.icon_vol = Gtk.Image.new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.MENU)
-        self.btn_vol.add(self.icon_vol)
-        self.btn_vol.connect("clicked", lambda w: self.popup_manager.toggle('volume'))
-        self.main_box.pack_start(self.btn_vol, False, False, 0)
-        
-        self.btn_bright = make_indicator()
-        self.btn_bright.add(Gtk.Image.new_from_icon_name("display-brightness-symbolic", Gtk.IconSize.MENU))
-        self.btn_bright.connect("clicked", lambda w: self.popup_manager.toggle('brightness'))
-        self.main_box.pack_start(self.btn_bright, False, False, 0)
-        
-        self.btn_wifi = make_indicator()
-        self.btn_wifi.add(Gtk.Image.new_from_icon_name("network-wireless-symbolic", Gtk.IconSize.MENU))
-        self.btn_wifi.connect("clicked", lambda x: subprocess.Popen(["nm-connection-editor"]))
-        self.main_box.pack_start(self.btn_wifi, False, False, 0)
-        
-        self.btn_bat = make_indicator()
-        self.icon_bat = Gtk.Image.new_from_icon_name("battery-good-symbolic", Gtk.IconSize.MENU)
-        self.lbl_bat = Gtk.Label()
-        box_bat = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
-        box_bat.pack_start(self.icon_bat, False, False, 0)
-        box_bat.pack_start(self.lbl_bat, False, False, 0)
-        self.btn_bat.add(box_bat)
-        self.btn_bat.connect("clicked", lambda x: subprocess.Popen(["xfce4-power-manager-settings"]))
-        self.main_box.pack_start(self.btn_bat, False, False, 0)
-        
-        self.btn_time = make_indicator()
-        self.lbl_time = Gtk.Label()
-        self.lbl_time.set_name("pill_label")
-        self.btn_time.add(self.lbl_time)
-        self.btn_time.connect("clicked", lambda w: self.popup_manager.toggle('calendar'))
-        self.main_box.pack_start(self.btn_time, False, False, 0)
-        
-        self.btn_power = make_indicator()
-        self.btn_power.add(Gtk.Image.new_from_icon_name("system-shutdown-symbolic", Gtk.IconSize.MENU))
-        self.btn_power.connect("clicked", lambda w: self.popup_manager.toggle('power'))
-        self.main_box.pack_start(self.btn_power, False, False, 4)
-        
-        self.add(self.main_box)
-        
-        self.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK)
-        self.connect("enter-notify-event", self.on_mouse_enter)
-        self.connect("leave-notify-event", self.on_mouse_leave)
-        
-        self.hide_timer = None
-        self.anim_timer = None
-        self.current_y = 0
-        self.target_y = 0
-        self.base_y = 0
-        
-        self.app_buttons = {}
-        self.pinned_info = self.load_pinned_apps()
-        
-        self.wnck_screen = Wnck.Screen.get_default()
-        self.wnck_screen.force_update()
-        self.wnck_screen.connect("window-opened", self.on_window_changed)
-        self.wnck_screen.connect("window-closed", self.on_window_changed)
-        self.wnck_screen.connect("active-window-changed", self.on_active_window_changed)
-        
-        GLib.idle_add(lambda: self.on_active_window_changed(self.wnck_screen, None) or False)
-        GLib.timeout_add(1000, self.enforce_visibility)
-        
-        GLib.timeout_add_seconds(1, self.update_status)
-        self.update_status()
-        
-        GLib.idle_add(self.refresh_windows)
-        GLib.idle_add(self.reposition)
-        GLib.timeout_add(500, self.remove_struts)
-        
-        self.hide_timer = GLib.timeout_add(2000, self.hide_panel)
-
-    def remove_struts(self):
-        if self.get_window():
-            xid = self.get_window().get_xid()
-            subprocess.Popen(['xprop', '-id', str(xid), '-remove', '_NET_WM_STRUT_PARTIAL'])
-            subprocess.Popen(['xprop', '-id', str(xid), '-remove', '_NET_WM_STRUT'])
-        return False
-
-    def setup_css(self):
-        css = b'''
                 * { outline: none; font-family: system-ui, sans-serif; }
         window, scrolledwindow, viewport { background-color: transparent; }
         #panel_box {

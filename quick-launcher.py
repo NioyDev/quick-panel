@@ -107,14 +107,9 @@ class QuickLauncher(Gtk.Window):
         * {
             outline: none;
         }
-        window {
-            background-color: transparent;
-        }
-        decoration, decoration:backdrop {
-            box-shadow: none;
-            background-color: transparent;
-            border: none;
-        }
+        window { background-color: transparent; }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
         #launcher_box {
             background-color: rgba(24, 24, 27, 0.95);
             border-radius: 24px;

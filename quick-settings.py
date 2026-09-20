@@ -292,17 +292,12 @@ class QuickSettingsPanel(Gtk.Window):
         }
         
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; } 
-            background-color: transparent; 
-        }
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
+
         
         #main_window { background-color: transparent; }
         decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-            background-color: #09090b; /* Zinc 950 */
-            border-radius: 28px;
-            border: 1px solid #27272a;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
+
         
         #avatar {
             background-color: #27272a;
