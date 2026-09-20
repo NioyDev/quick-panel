@@ -90,10 +90,11 @@ class QuickPanel(Gtk.Window):
         self.btn_bright.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-brightness.py"]))
         self.right_box.pack_start(self.btn_bright, False, False, 0)
         
-        self.btn_wifi = make_indicator()
-        self.btn_wifi.add(Gtk.Image.new_from_icon_name("network-wireless-symbolic", Gtk.IconSize.MENU))
-        self.btn_wifi.connect("clicked", lambda x: subprocess.Popen(["nm-connection-editor"]))
-        self.right_box.pack_start(self.btn_wifi, False, False, 0)
+        self.btn_net = make_indicator()
+        self.icon_net = Gtk.Image.new_from_icon_name("network-wireless-signal-excellent-symbolic", Gtk.IconSize.MENU)
+        self.btn_net.add(self.icon_net)
+        self.btn_net.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-wifi.py"]))
+        self.right_box.pack_start(self.btn_net, False, False, 0)
         
         self.btn_bat = make_indicator()
         self.icon_bat = Gtk.Image.new_from_icon_name("battery-good-symbolic", Gtk.IconSize.MENU)
