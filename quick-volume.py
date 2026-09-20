@@ -256,8 +256,8 @@ class QuickVolume(Gtk.Window):
     def on_bt_switch_toggled(self, switch, gparam):
         if self.ignore_bt_switch: return
         state = switch.get_active()
-        cmd = "power on" if state else "power off"
-        subprocess.Popen(["bluetoothctl", cmd])
+        cmd_arg = "on" if state else "off"
+        subprocess.Popen(["bluetoothctl", "power", cmd_arg])
         GLib.timeout_add(1000, self.populate_bt)
         
     def on_bt_connect(self, btn, mac):
