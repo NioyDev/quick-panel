@@ -62,8 +62,10 @@ class WifiPasswordDialog(Gtk.Dialog):
         return False
 
     def on_button_press(self, widget, event):
-        width, height = self.get_size()
-        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+        x, y = self.get_position()
+        w, h = self.get_size()
+        _, root_x, root_y = event.get_root_coords()
+        if root_x < x or root_x > x + w or root_y < y or root_y > y + h:
             self.response(Gtk.ResponseType.CANCEL)
             return True
         return False
@@ -418,6 +420,8 @@ class QuickWifi(Gtk.Window):
     def ask_password_and_connect(self, ssid, bssid):
         self.release_grab()
         dialog = WifiPasswordDialog(self, ssid)
+        self.active_dialog = dialog
+        dialog.connect("destroy", lambda x: setattr(self, 'active_dialog', None))
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             password = dialog.entry.get_text()
@@ -443,6 +447,8 @@ class QuickWifi(Gtk.Window):
         seat.ungrab()
 
     def bind_dialog_grab(self, dialog):
+        self.active_dialog = dialog
+        dialog.connect("destroy", lambda x: setattr(self, 'active_dialog', None))
         dialog.connect("map-event", self.on_dialog_map)
         dialog.connect("unmap-event", self.on_dialog_unmap)
         dialog.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
@@ -459,8 +465,10 @@ class QuickWifi(Gtk.Window):
         return False
 
     def on_dialog_button_press(self, widget, event):
-        width, height = widget.get_size()
-        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+        x, y = widget.get_position()
+        w, h = widget.get_size()
+        _, root_x, root_y = event.get_root_coords()
+        if root_x < x or root_x > x + w or root_y < y or root_y > y + h:
             widget.response(Gtk.ResponseType.CANCEL)
             return True
         return False
@@ -559,8 +567,14 @@ class QuickWifi(Gtk.Window):
         return False
 
     def on_button_press(self, widget, event):
-        width, height = self.get_size()
-        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+        if hasattr(self, 'active_dialog') and self.active_dialog:
+            self.active_dialog.response(Gtk.ResponseType.CANCEL)
+            return True
+            
+        x, y = self.get_position()
+        w, h = self.get_size()
+        _, root_x, root_y = event.get_root_coords()
+        if root_x < x or root_x > x + w or root_y < y or root_y > y + h:
             Gtk.main_quit()
             return True
         return False
