@@ -62,6 +62,10 @@ window { background-color: transparent; }
 class QuickBattery(Gtk.Window):
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        self.set_keep_above(True)
+        self.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
+        self.set_skip_taskbar_hint(True)
+        self.set_skip_pager_hint(True)
         self.set_default_size(320, -1)
         
         screen = Gdk.Screen.get_default()
