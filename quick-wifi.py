@@ -18,6 +18,11 @@ class WifiPasswordDialog(Gtk.Dialog):
         self.set_default_size(300, 150)
         self.set_border_width(16)
         
+        self.connect("map-event", self.on_map)
+        self.connect("unmap-event", self.on_unmap)
+        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        self.connect("button-press-event", self.on_button_press)
+        
         box = self.get_content_area()
         box.set_spacing(12)
         
@@ -45,6 +50,23 @@ class WifiPasswordDialog(Gtk.Dialog):
         box.pack_end(btn_box, False, False, 0)
         
         self.show_all()
+
+    def on_map(self, widget, event):
+        seat = Gdk.Display.get_default().get_default_seat()
+        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL_POINTING, True, None, None, None)
+        return False
+        
+    def on_unmap(self, widget, event):
+        seat = Gdk.Display.get_default().get_default_seat()
+        seat.ungrab()
+        return False
+
+    def on_button_press(self, widget, event):
+        width, height = self.get_size()
+        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+            self.response(Gtk.ResponseType.CANCEL)
+            return True
+        return False
 
 class QuickWifi(Gtk.Window):
     def __init__(self):
@@ -304,6 +326,7 @@ class QuickWifi(Gtk.Window):
         dialog.set_modal(True)
         dialog.set_keep_above(True)
         dialog.set_border_width(16)
+        self.bind_dialog_grab(dialog)
         box = dialog.get_content_area()
         box.set_spacing(12)
         
@@ -354,6 +377,8 @@ class QuickWifi(Gtk.Window):
             dialog.set_modal(True)
             dialog.set_keep_above(True)
             dialog.set_border_width(16)
+            self.bind_dialog_grab(dialog)
+            dialog.connect("response", lambda d, r: d.destroy())
             box = dialog.get_content_area()
             
             lbl = Gtk.Label()
@@ -416,6 +441,29 @@ class QuickWifi(Gtk.Window):
     def release_grab(self):
         seat = Gdk.Display.get_default().get_default_seat()
         seat.ungrab()
+
+    def bind_dialog_grab(self, dialog):
+        dialog.connect("map-event", self.on_dialog_map)
+        dialog.connect("unmap-event", self.on_dialog_unmap)
+        dialog.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        dialog.connect("button-press-event", self.on_dialog_button_press)
+
+    def on_dialog_map(self, widget, event):
+        seat = Gdk.Display.get_default().get_default_seat()
+        seat.grab(widget.get_window(), Gdk.SeatCapabilities.ALL_POINTING, True, None, None, None)
+        return False
+
+    def on_dialog_unmap(self, widget, event):
+        seat = Gdk.Display.get_default().get_default_seat()
+        seat.ungrab()
+        return False
+
+    def on_dialog_button_press(self, widget, event):
+        width, height = widget.get_size()
+        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+            widget.response(Gtk.ResponseType.CANCEL)
+            return True
+        return False
 
     def show_error(self, message):
         self.release_grab()
