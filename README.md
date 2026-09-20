@@ -5,6 +5,7 @@ Un entorno de escritorio súper ligero, rápido y hermoso para reemplazar el pan
 ## Componentes
 
 - **Quick Panel (`quick-panel.py`)**: La barra principal flotante que actúa como Dock y Panel de control unificado.
+- **Gestor de Wi-Fi Inteligente (`quick-wifi.py`)**: Panel dedicado para redes inalámbricas. Permite escanear, conectar, generar códigos QR gigantes para compartir tu red escaneando la pantalla, e incluye un temporizador para desconexión automática.
 - **Lanzador de Aplicaciones (`quick-launcher.py`)**: Un menú de aplicaciones flotante con barra de búsqueda que se cierra automáticamente al perder el foco o hacer clic afuera.
 - **Control de Volumen (`quick-volume.py`)**: Deslizadores para altavoces y micrófono con diseño moderno.
 - **Control de Brillo (`quick-brightness.py`)**: Un deslizador flotante para ajustar el brillo de la pantalla instantáneamente.
@@ -16,10 +17,10 @@ Un entorno de escritorio súper ligero, rápido y hermoso para reemplazar el pan
 ## Requisitos
 
 - Linux Mint XFCE (o cualquier entorno basado en X11/GTK3)
-- `python3-gi`, `gir1.2-gtk-3.0`
-- `xdotool`, `wmctrl`, `xprop`
-- `pulseaudio-utils` (para el volumen)
-- `brightnessctl` (para el control de brillo)
+- Paquetes base: `python3-gi`, `gir1.2-gtk-3.0`
+- Utilidades de ventana: `xdotool`, `wmctrl`, `xprop`
+- Herramientas de sistema: `pulseaudio-utils` (volumen), `brightnessctl` (brillo)
+- Redes: `python3-qrcode` (para generar códigos QR), `network-manager` (nmcli)
 
 ## Instalación Universal
 

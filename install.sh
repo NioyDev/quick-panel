@@ -8,7 +8,7 @@ echo "Te pediremos tu contraseña para instalar dependencias."
 
 # 1. Instalar dependencias
 sudo apt-get update
-sudo apt-get install -y python3 python3-gi gir1.2-gtk-3.0 xdotool wmctrl pulseaudio-utils brightnessctl
+sudo apt-get install -y python3 python3-gi gir1.2-gtk-3.0 xdotool wmctrl pulseaudio-utils brightnessctl python3-qrcode
 
 # 2. Quitar el menú viejo (xfce4-panel)
 echo "🧹 Deshabilitando el panel por defecto de XFCE..."
