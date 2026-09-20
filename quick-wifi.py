@@ -14,6 +14,7 @@ class WifiPasswordDialog(Gtk.Dialog):
         super().__init__(title=f"Contraseña para {ssid}", transient_for=parent, flags=0)
         self.set_decorated(False)
         self.set_modal(True)
+        self.set_keep_above(True)
         self.set_default_size(300, 150)
         self.set_border_width(16)
         
@@ -301,6 +302,7 @@ class QuickWifi(Gtk.Window):
         dialog = Gtk.Dialog(title="Temporizador", transient_for=self, flags=0)
         dialog.set_decorated(False)
         dialog.set_modal(True)
+        dialog.set_keep_above(True)
         dialog.set_border_width(16)
         box = dialog.get_content_area()
         box.set_spacing(12)
@@ -350,6 +352,7 @@ class QuickWifi(Gtk.Window):
             dialog = Gtk.Dialog(title="Escanear para conectar", transient_for=self, flags=0)
             dialog.set_decorated(False)
             dialog.set_modal(True)
+            dialog.set_keep_above(True)
             dialog.set_border_width(16)
             box = dialog.get_content_area()
             
@@ -418,6 +421,7 @@ class QuickWifi(Gtk.Window):
         self.release_grab()
         dialog = Gtk.MessageDialog(transient_for=self, flags=0, message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK, text=message)
         dialog.set_modal(True)
+        dialog.set_keep_above(True)
         dialog.run()
         dialog.destroy()
 
