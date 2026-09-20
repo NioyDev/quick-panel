@@ -323,7 +323,9 @@ class QuickWifi(Gtk.Window):
 
     def show_timer_dialog(self, btn, ssid):
         self.release_grab()
-        dialog = Gtk.Dialog(title="Temporizador", transient_for=self, flags=0)
+        self.hide()
+        dialog = Gtk.Dialog(title="Temporizador", transient_for=None, flags=0)
+        dialog.set_position(Gtk.WindowPosition.CENTER)
         dialog.set_decorated(False)
         dialog.set_modal(True)
         dialog.set_keep_above(True)
@@ -360,6 +362,8 @@ class QuickWifi(Gtk.Window):
                 subprocess.run(["nmcli", "con", "down", ssid])
             threading.Thread(target=worker, daemon=True).start()
         dialog.destroy()
+        self.show_all()
+        self.on_map(None, None)
 
     def show_qr(self, btn, ssid):
         try:
@@ -374,13 +378,21 @@ class QuickWifi(Gtk.Window):
             img.save(img_path)
             
             self.release_grab()
-            dialog = Gtk.Dialog(title="Escanear para conectar", transient_for=self, flags=0)
+            self.hide()
+            dialog = Gtk.Dialog(title="Escanear para conectar", transient_for=None, flags=0)
+            dialog.set_position(Gtk.WindowPosition.CENTER)
             dialog.set_decorated(False)
             dialog.set_modal(True)
             dialog.set_keep_above(True)
             dialog.set_border_width(16)
             self.bind_dialog_grab(dialog)
-            dialog.connect("response", lambda d, r: d.destroy())
+            
+            def on_qr_close(d, r):
+                d.destroy()
+                self.show_all()
+                self.on_map(None, None)
+                
+            dialog.connect("response", on_qr_close)
             box = dialog.get_content_area()
             
             lbl = Gtk.Label()
@@ -419,10 +431,16 @@ class QuickWifi(Gtk.Window):
 
     def ask_password_and_connect(self, ssid, bssid):
         self.release_grab()
-        dialog = WifiPasswordDialog(self, ssid)
+        self.hide()
+        dialog = WifiPasswordDialog(None, ssid)
+        dialog.set_position(Gtk.WindowPosition.CENTER)
         self.active_dialog = dialog
         dialog.connect("destroy", lambda x: setattr(self, 'active_dialog', None))
         response = dialog.run()
+        dialog.destroy()
+        self.show_all()
+        self.on_map(None, None)
+        
         if response == Gtk.ResponseType.OK:
             password = dialog.entry.get_text()
             dialog.destroy()
@@ -432,7 +450,6 @@ class QuickWifi(Gtk.Window):
                     GLib.idle_add(self.scan_networks)
                 threading.Thread(target=worker).start()
         else:
-            dialog.destroy()
             self.scan_networks()
 
     def on_disconnect(self, btn, ssid):
@@ -475,11 +492,15 @@ class QuickWifi(Gtk.Window):
 
     def show_error(self, message):
         self.release_grab()
-        dialog = Gtk.MessageDialog(transient_for=self, flags=0, message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK, text=message)
+        self.hide()
+        dialog = Gtk.MessageDialog(transient_for=None, flags=0, message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK, text=message)
+        dialog.set_position(Gtk.WindowPosition.CENTER)
         dialog.set_modal(True)
         dialog.set_keep_above(True)
         dialog.run()
         dialog.destroy()
+        self.show_all()
+        self.on_map(None, None)
 
     def on_switch_toggled(self, switch, gparam):
         if self.ignore_switch: return
