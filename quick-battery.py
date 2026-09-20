@@ -14,6 +14,7 @@ window {
     background-color: #18181b;
     border-radius: 20px;
     border: 1px solid #27272a;
+    padding: 24px;
 }
 .title-label {
     font-size: 16px;
@@ -65,7 +66,7 @@ class QuickBattery(Gtk.Window):
         
         screen = Gdk.Screen.get_default()
         monitor = screen.get_monitor_geometry(screen.get_primary_monitor())
-        self.move(monitor.width - 340, monitor.height - 300)
+        self.move(monitor.width - 340, monitor.height - 450)
         
         self.set_decorated(False)
         self.set_app_paintable(True)
@@ -88,12 +89,12 @@ class QuickBattery(Gtk.Window):
         self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
         self.connect("button-press-event", self.on_button_press)
 
-        self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
+        self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         self.main_box.set_name("main_box")
-        self.main_box.set_border_width(16)
         
-        header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.icon_bat = Gtk.Image.new_from_icon_name("battery-full-symbolic", Gtk.IconSize.LARGE_TOOLBAR)
+        header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        self.icon_bat = Gtk.Image.new_from_icon_name("battery-full-symbolic", Gtk.IconSize.MENU)
+        self.icon_bat.set_pixel_size(24)
         self.lbl_title = Gtk.Label(label="Batería")
         self.lbl_title.get_style_context().add_class("title-label")
         header.pack_start(self.icon_bat, False, False, 0)
