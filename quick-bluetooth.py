@@ -53,15 +53,10 @@ class QuickBluetooth(Gtk.Window):
         self.bt_scroll.set_min_content_height(200)
         self.bt_scroll.set_max_content_height(400)
         
-        self.bt_flow = Gtk.FlowBox()
-        self.bt_flow.set_valign(Gtk.Align.START)
-        self.bt_flow.set_max_children_per_line(2)
-        self.bt_flow.set_selection_mode(Gtk.SelectionMode.NONE)
-        self.bt_flow.set_column_spacing(12)
-        self.bt_flow.set_row_spacing(12)
-        self.bt_scroll.add(self.bt_flow)
+        self.bt_list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        self.bt_scroll.add(self.bt_list_box)
         self.main_box.pack_start(self.bt_scroll, True, True, 0)
-        self.main_box.set_size_request(480, 270)
+        self.main_box.set_size_request(380, 270)
         
         self.add(self.main_box)
         
@@ -77,8 +72,8 @@ class QuickBluetooth(Gtk.Window):
         GLib.idle_add(self.position_window)
 
     def populate_bt(self):
-        for child in self.bt_flow.get_children():
-            self.bt_flow.remove(child)
+        for child in self.bt_list_box.get_children():
+            self.bt_list_box.remove(child)
             
         try:
             bt_out = subprocess.check_output("LC_ALL=C bluetoothctl show", shell=True).decode()
@@ -90,28 +85,25 @@ class QuickBluetooth(Gtk.Window):
         
         bt_devices = self.get_bt_devices()
         for dev in bt_devices:
-            card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-            card.set_name("bt_card")
+            row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
             lbl = Gtk.Label(label=dev['name'])
-            lbl.set_halign(Gtk.Align.CENTER)
-            lbl.set_ellipsize(Pango.EllipsizeMode.END)
+            lbl.set_halign(Gtk.Align.START)
             
             btn = Gtk.Button()
             btn.set_name("bt_dev_btn")
-            btn.set_halign(Gtk.Align.CENTER)
             if dev['connected']:
                 btn.set_label("Desconectar")
                 btn.connect("clicked", self.on_bt_disconnect, dev['mac'])
-                lbl.set_markup(f"<b>{dev['name']}</b>")
+                lbl.set_markup(f"<b>{dev['name']}</b> (Conectado)")
             else:
                 btn.set_label("Conectar")
                 btn.connect("clicked", self.on_bt_connect, dev['mac'])
             
-            card.pack_start(lbl, False, False, 0)
-            card.pack_start(btn, False, False, 0)
-            self.bt_flow.insert(card, -1)
+            row.pack_start(lbl, True, True, 0)
+            row.pack_start(btn, False, False, 0)
+            self.bt_list_box.pack_start(row, False, False, 0)
             
-        self.bt_flow.show_all()
+        self.bt_list_box.show_all()
         return False
 
     def get_connected_bt(self):
@@ -204,12 +196,6 @@ class QuickBluetooth(Gtk.Window):
             padding: 2px 8px;
         }
         #bt_dev_btn:hover { background-color: #52525b; }
-        #bt_card {
-            background-color: #27272a;
-            border-radius: 12px;
-            padding: 12px;
-            min-width: 180px;
-        }
         '''
         provider = Gtk.CssProvider()
         provider.load_from_data(css)
