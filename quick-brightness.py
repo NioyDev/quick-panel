@@ -84,6 +84,7 @@ class QuickBrightness(Gtk.Window):
 
     def setup_css(self):
         css = b"""
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         window { background-color: transparent; }
         #bright_box {
             background-color: #18181b;

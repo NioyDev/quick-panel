@@ -105,6 +105,7 @@ class QuickLauncher(Gtk.Window):
         
     def setup_css(self):
         css = b'''
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         * {
             outline: none;
         }

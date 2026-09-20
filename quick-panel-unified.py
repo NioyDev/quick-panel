@@ -185,6 +185,7 @@ class QuickVolume(BasePopup):
 
     def setup_css(self):
         css = b'''
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         * { outline: none; }
         window { background-color: transparent; }
         #volume_box {
@@ -249,6 +250,7 @@ class QuickBrightness(BasePopup):
 
     def setup_css(self):
         css = b'''
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         window { background-color: transparent; }
         #bright_box {
             background-color: #18181b;
@@ -316,6 +318,7 @@ class QuickCalendar(BasePopup):
 
     def setup_css(self):
         css = b'''
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         * { outline: none; color: #fafafa; }
         window { background-color: transparent; }
         #cal_box {
@@ -398,6 +401,7 @@ class QuickPower(BasePopup):
 
     def setup_css(self):
         css = b'''
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         window { background-color: transparent; }
         #power_box {
             background-color: #18181b;
@@ -547,6 +551,7 @@ class QuickLauncher(BasePopup):
 
     def setup_css(self):
         css = b'''
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         * { outline: none; }
         window { background-color: transparent; }
         #launcher_box {
@@ -709,6 +714,7 @@ class QuickPanel(Gtk.Window):
 
     def setup_css(self):
         css = b'''
+        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
         * { outline: none; font-family: system-ui, sans-serif; }
         window, scrolledwindow, viewport { background-color: transparent; }
         #panel_box {
