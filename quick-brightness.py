@@ -7,7 +7,9 @@ import sys
 import os
 
 class QuickBrightness(Gtk.Window):
-        def on_draw(self, widget, cr):
+
+
+    def on_draw(self, widget, cr):
         cr.set_source_rgba(0, 0, 0, 0)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()

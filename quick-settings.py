@@ -8,6 +8,13 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, Pango, GLib
 
 class QuickToggle(Gtk.Box):
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self, icon_name, title, subtitle_on, subtitle_off, cmd_on, cmd_off, cmd_check):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         self.cmd_on = cmd_on
@@ -62,7 +69,9 @@ class QuickToggle(Gtk.Box):
 
 
 class QuickSettingsPanel(Gtk.Window):
-        def on_draw(self, widget, cr):
+
+
+    def on_draw(self, widget, cr):
         cr.set_source_rgba(0, 0, 0, 0)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()

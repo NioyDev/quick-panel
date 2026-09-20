@@ -29,7 +29,9 @@ CATEGORIES = {
 }
 
 class PopupManager:
-        def on_draw(self, widget, cr):
+
+
+    def on_draw(self, widget, cr):
         cr.set_source_rgba(0, 0, 0, 0)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
@@ -98,6 +100,13 @@ class PopupManager:
 
 
 class BasePopup(Gtk.Window):
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self, manager, **kwargs):
         super().__init__(type=Gtk.WindowType.TOPLEVEL, **kwargs)
         self.manager = manager
@@ -130,6 +139,13 @@ class BasePopup(Gtk.Window):
 
 
 class QuickVolume(BasePopup):
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
@@ -215,6 +231,13 @@ class QuickVolume(BasePopup):
 
 
 class QuickBrightness(BasePopup):
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
@@ -279,6 +302,13 @@ class QuickBrightness(BasePopup):
 
 
 class QuickCalendar(BasePopup):
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
@@ -352,6 +382,13 @@ class QuickCalendar(BasePopup):
 
 
 class QuickPower(BasePopup):
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self, manager):
         super().__init__(manager)
         self.setup_css()
@@ -442,6 +479,13 @@ class QuickPower(BasePopup):
 
 
 class QuickLauncher(BasePopup):
+
+    def on_draw(self, widget, cr):
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        return False
+
     def __init__(self, manager):
         super().__init__(manager)
         self.set_default_size(650, 500)
