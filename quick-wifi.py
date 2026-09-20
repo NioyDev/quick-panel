@@ -532,8 +532,7 @@ class QuickWifi(Gtk.Window):
         css = b'''
         * { outline: none; }
         window { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; }
-        #wifi_box {
+                #wifi_box {
             background-color: #18181b;
             border-radius: 20px;
             border: 1px solid #27272a;

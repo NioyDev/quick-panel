@@ -20,7 +20,7 @@ PINNED_APPS = [
 
 class QuickPanel(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_title("QuickPanel")
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
@@ -164,8 +164,7 @@ class QuickPanel(Gtk.Window):
         css = b'''
         * { outline: none; font-family: system-ui, sans-serif; }
         window, scrolledwindow, viewport { background-color: transparent; }
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; }
-        #panel_box {
+                #panel_box {
             background-color: #18181b;
             border-radius: 20px;
             border: 1px solid #27272a;

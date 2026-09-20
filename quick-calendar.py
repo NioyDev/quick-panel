@@ -82,8 +82,7 @@ class QuickCalendar(Gtk.Window):
 
     def setup_css(self):
         css = b'''
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        * { outline: none; color: #fafafa; }
+                * { outline: none; color: #fafafa; }
         window { background-color: transparent; }
         #cal_box {
             background-color: #18181b;

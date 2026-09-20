@@ -185,8 +185,7 @@ class QuickVolume(BasePopup):
 
     def setup_css(self):
         css = b'''
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        * { outline: none; }
+                * { outline: none; }
         window { background-color: transparent; }
         #volume_box {
             background-color: #18181b;
@@ -250,8 +249,7 @@ class QuickBrightness(BasePopup):
 
     def setup_css(self):
         css = b'''
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        window { background-color: transparent; }
+                window { background-color: transparent; }
         #bright_box {
             background-color: #18181b;
             border-radius: 24px;
@@ -318,8 +316,7 @@ class QuickCalendar(BasePopup):
 
     def setup_css(self):
         css = b'''
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        * { outline: none; color: #fafafa; }
+                * { outline: none; color: #fafafa; }
         window { background-color: transparent; }
         #cal_box {
             background-color: #18181b;
@@ -401,8 +398,7 @@ class QuickPower(BasePopup):
 
     def setup_css(self):
         css = b'''
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        window { background-color: transparent; }
+                window { background-color: transparent; }
         #power_box {
             background-color: #18181b;
             border-radius: 24px;
@@ -551,8 +547,7 @@ class QuickLauncher(BasePopup):
 
     def setup_css(self):
         css = b'''
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        * { outline: none; }
+                * { outline: none; }
         window { background-color: transparent; }
         #launcher_box {
             background-color: rgba(24, 24, 27, 0.95);
@@ -586,7 +581,7 @@ class QuickLauncher(BasePopup):
 
 class QuickPanel(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_title("QuickPanel")
         self.set_decorated(False)
         self.set_skip_taskbar_hint(True)
@@ -714,8 +709,7 @@ class QuickPanel(Gtk.Window):
 
     def setup_css(self):
         css = b'''
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        * { outline: none; font-family: system-ui, sans-serif; }
+                * { outline: none; font-family: system-ui, sans-serif; }
         window, scrolledwindow, viewport { background-color: transparent; }
         #panel_box {
             background-color: #18181b; border-radius: 20px;

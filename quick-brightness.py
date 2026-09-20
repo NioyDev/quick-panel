@@ -7,7 +7,7 @@ import os
 
 class QuickBrightness(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_decorated(False)
         self.set_keep_above(True)
         self.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
@@ -84,8 +84,7 @@ class QuickBrightness(Gtk.Window):
 
     def setup_css(self):
         css = b"""
-        decoration, decoration:backdrop { box-shadow: none; background-color: transparent; border: none; }
-        window { background-color: transparent; }
+                window { background-color: transparent; }
         #bright_box {
             background-color: #18181b;
             border-radius: 24px;

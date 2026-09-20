@@ -62,7 +62,7 @@ class QuickToggle(Gtk.Box):
 
 class QuickSettingsPanel(Gtk.Window):
     def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        super().__init__(type=Gtk.WindowType.POPUP)
         self.set_decorated(False)
         self.set_type_hint(Gdk.WindowTypeHint.DROPDOWN_MENU)
         self.set_skip_taskbar_hint(True)
