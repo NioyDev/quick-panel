@@ -1,6 +1,6 @@
 # Quick Panel (Entorno Premium Multi-Plataforma)
 
-![Quick Panel Preview](assets/preview.png)
+![Quick Panel Preview](./assets/quick-panel-preview.png)
 
 Un entorno de escritorio súper ligero, rápido y hermoso para reemplazar paneles tradicionales en **Linux** (Linux Mint, XFCE, Ubuntu) y **Windows** (10/11). Construido completamente en Python y GTK3. Diseñado con una estética moderna de glassmorphism, botones flotantes, esquinas redondeadas, tarjetas interactivas de reproducción y animaciones fluidas.
 
