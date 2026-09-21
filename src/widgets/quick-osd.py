@@ -321,8 +321,11 @@ class OSDWindow(Gtk.Window):
 
     def refresh_card_content(self):
         title, artist, art_url = get_media_info()
+        status = get_playerctl_value(["status"]).lower()
         
-        if title:
+        is_media_active = bool(title and status in ["playing", "paused"])
+        
+        if is_media_active:
             artist_text = (artist if artist else "REPRODUCTOR").upper()
             self.lbl_artist.set_markup(
                 f"<span font='9' weight='bold' color='#a1a1aa'>"
@@ -332,6 +335,7 @@ class OSDWindow(Gtk.Window):
                 f"<span font='13' weight='bold' color='#ffffff'>"
                 f"{GLib.markup_escape_text(title)}</span>"
             )
+            self.art_area.show()
             self.lbl_artist.show()
             self.lbl_title.show()
             self.ctrl_row.show_all()
@@ -356,35 +360,33 @@ class OSDWindow(Gtk.Window):
                     self.progress_box.hide()
             else:
                 self.progress_box.hide()
-        else:
-            self.lbl_artist.set_markup(
-                "<span font='9' weight='bold' color='#a1a1aa'>CONTROL DE VOLUMEN</span>"
-            )
-            self.lbl_title.set_markup(
-                "<span font='13' weight='bold' color='#ffffff'>Sonido Principal</span>"
-            )
-            self.lbl_artist.show()
-            self.lbl_title.show()
-            self.ctrl_row.hide()
-            self.progress_box.hide()
 
-        self._art_pixbuf = None
-        if art_url:
-            try:
-                if art_url.startswith("file://"):
-                    art_path = urllib.parse.unquote(art_url[7:])
-                else:
-                    art_path = "/tmp/osd_art.jpg"
-                    urllib.request.urlretrieve(art_url, art_path)
-                
-                pb = GdkPixbuf.Pixbuf.new_from_file(art_path)
-                self._art_pixbuf = pb.scale_simple(
-                    self.ART_SIZE, self.ART_SIZE, GdkPixbuf.InterpType.BILINEAR
-                )
-            except Exception:
-                pass
-                
-        self.art_area.queue_draw()
+            self._art_pixbuf = None
+            if art_url:
+                try:
+                    if art_url.startswith("file://"):
+                        art_path = urllib.parse.unquote(art_url[7:])
+                    else:
+                        art_path = "/tmp/osd_art.jpg"
+                        urllib.request.urlretrieve(art_url, art_path)
+                    
+                    pb = GdkPixbuf.Pixbuf.new_from_file(art_path)
+                    self._art_pixbuf = pb.scale_simple(
+                        self.ART_SIZE, self.ART_SIZE, GdkPixbuf.InterpType.BILINEAR
+                    )
+                except Exception:
+                    pass
+            self.art_area.queue_draw()
+            self.set_size_request(440, -1)
+            self.resize(440, 1)
+        else:
+            self.art_area.hide()
+            self.lbl_artist.hide()
+            self.lbl_title.hide()
+            self.progress_box.hide()
+            self.ctrl_row.hide()
+            self.set_size_request(320, -1)
+            self.resize(320, 1)
 
     def draw_progress(self, widget, cr):
         w = widget.get_allocated_width()
