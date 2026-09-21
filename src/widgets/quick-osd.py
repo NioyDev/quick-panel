@@ -597,5 +597,5 @@ class OSDWindow(Gtk.Window):
         cr.stroke()
 
 win = OSDWindow()
-win.show_all()
+win.show()
 Gtk.main()
