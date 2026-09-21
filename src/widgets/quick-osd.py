@@ -54,19 +54,23 @@ def get_current_volume():
     except Exception:
         return 50
 
+def set_system_volume(vol):
+    vol = max(0, min(100, int(vol)))
+    if IS_WINDOWS:
+        set_windows_volume(vol)
+    else:
+        try:
+            subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{vol}%"])
+        except Exception:
+            pass
+
 volume = get_current_volume()
 if action == "up":
     volume = min(volume + 5, 100)
-    if IS_WINDOWS:
-        set_windows_volume(volume)
-    else:
-        subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{volume}%"])
+    set_system_volume(volume)
 elif action == "down":
     volume = max(volume - 5, 0)
-    if IS_WINDOWS:
-        set_windows_volume(volume)
-    else:
-        subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{volume}%"])
+    set_system_volume(volume)
 
 def get_media_info():
     if IS_WINDOWS:
@@ -324,6 +328,8 @@ class OSDWindow(Gtk.Window):
         status = get_playerctl_value(["status"]).lower()
         
         is_media_active = bool(title and status in ["playing", "paused"])
+        
+        self.main_box.show_all()
         
         if is_media_active:
             artist_text = (artist if artist else "REPRODUCTOR").upper()
