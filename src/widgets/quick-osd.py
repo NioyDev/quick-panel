@@ -10,7 +10,16 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, Pango
 import cairo
-import dbus
+# Import Windows compatibility helper if available
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+try:
+    from utils.win_compat import IS_WINDOWS, get_windows_volume, set_windows_volume, get_windows_media_info, run_windows_playerctl
+except Exception:
+    IS_WINDOWS = (os.name == 'nt')
+    get_windows_volume = lambda: 50
+    set_windows_volume = lambda v: None
+    get_windows_media_info = lambda: ("", "", "")
+    run_windows_playerctl = lambda c: None
 
 action = sys.argv[1] if len(sys.argv) > 1 else None
 
@@ -36,6 +45,8 @@ except Exception:
     pass
 
 def get_current_volume():
+    if IS_WINDOWS:
+        return get_windows_volume()
     try:
         pactl_out = subprocess.check_output(["pactl", "get-sink-volume", "@DEFAULT_SINK@"]).decode('utf-8')
         vol_str = pactl_out.split('/')[1].strip().replace('%', '')
@@ -46,14 +57,23 @@ def get_current_volume():
 volume = get_current_volume()
 if action == "up":
     volume = min(volume + 5, 100)
-    subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{volume}%"])
+    if IS_WINDOWS:
+        set_windows_volume(volume)
+    else:
+        subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{volume}%"])
 elif action == "down":
     volume = max(volume - 5, 0)
-    subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{volume}%"])
+    if IS_WINDOWS:
+        set_windows_volume(volume)
+    else:
+        subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{volume}%"])
 
 def get_media_info():
+    if IS_WINDOWS:
+        return get_windows_media_info()
     title, artist, art_url = "", "", ""
     try:
+        import dbus
         bus = dbus.SessionBus()
         active_player = None
         for service in bus.list_names():
@@ -85,10 +105,13 @@ def get_media_info():
     return title, artist, art_url
 
 def run_playerctl(cmd):
-    try:
-        subprocess.Popen(["playerctl"] + cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception:
-        pass
+    if IS_WINDOWS:
+        run_windows_playerctl(cmd[0] if cmd else "")
+    else:
+        try:
+            subprocess.Popen(["playerctl"] + cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
 
 def get_playerctl_value(cmd):
     try:
@@ -477,7 +500,7 @@ class OSDWindow(Gtk.Window):
             self.vol_label.set_text(f"{self.current_volume}%")
             self.vol_icon.set_from_icon_name(self.get_volume_icon_name(self.current_volume), Gtk.IconSize.MENU)
             self.updating_programmatically = False
-            subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{self.current_volume}%"])
+            set_system_volume(self.current_volume)
         self.refresh_card_content()
         self.reset_timeout()
         return True
@@ -490,7 +513,7 @@ class OSDWindow(Gtk.Window):
             self.vol_label.set_text(f"{self.current_volume}%")
             self.vol_icon.set_from_icon_name(self.get_volume_icon_name(self.current_volume), Gtk.IconSize.MENU)
             self.updating_programmatically = False
-            subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{self.current_volume}%"])
+            set_system_volume(self.current_volume)
         self.refresh_card_content()
         self.reset_timeout()
         return True
@@ -523,7 +546,7 @@ class OSDWindow(Gtk.Window):
         self.reset_timeout()
 
     def apply_pending_volume(self):
-        subprocess.Popen(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{self.pending_volume}%"])
+        set_system_volume(self.pending_volume)
         self.throttle_id = None
         return False
 
