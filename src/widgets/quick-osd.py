@@ -329,24 +329,24 @@ class OSDWindow(Gtk.Window):
         
         is_media_active = bool(title and status in ["playing", "paused"])
         
-        self.main_box.show_all()
-        
         if is_media_active:
             artist_text = (artist if artist else "REPRODUCTOR").upper()
-            self.lbl_artist.set_markup(
-                f"<span font='9' weight='bold' color='#a1a1aa'>"
-                f"{GLib.markup_escape_text(artist_text)}</span>"
-            )
-            self.lbl_title.set_markup(
-                f"<span font='13' weight='bold' color='#ffffff'>"
-                f"{GLib.markup_escape_text(title)}</span>"
-            )
-            self.art_area.show()
-            self.lbl_artist.show()
-            self.lbl_title.show()
-            self.ctrl_row.show_all()
+            title_text = title
+        else:
+            artist_text = "SISTEMA"
+            title_text = "Volumen General"
 
-            # Playback Progress + Timestamps
+        self.lbl_artist.set_markup(
+            f"<span font='9' weight='bold' color='#a1a1aa'>"
+            f"{GLib.markup_escape_text(artist_text)}</span>"
+        )
+        self.lbl_title.set_markup(
+            f"<span font='13' weight='bold' color='#ffffff'>"
+            f"{GLib.markup_escape_text(title_text)}</span>"
+        )
+
+        # Playback Progress + Timestamps
+        if is_media_active:
             pos = get_playerctl_value(["position"])
             dur = get_playerctl_value(["metadata", "mpris:length"])
             if pos and dur:
@@ -366,33 +366,27 @@ class OSDWindow(Gtk.Window):
                     self.progress_box.hide()
             else:
                 self.progress_box.hide()
-
-            self._art_pixbuf = None
-            if art_url:
-                try:
-                    if art_url.startswith("file://"):
-                        art_path = urllib.parse.unquote(art_url[7:])
-                    else:
-                        art_path = "/tmp/osd_art.jpg"
-                        urllib.request.urlretrieve(art_url, art_path)
-                    
-                    pb = GdkPixbuf.Pixbuf.new_from_file(art_path)
-                    self._art_pixbuf = pb.scale_simple(
-                        self.ART_SIZE, self.ART_SIZE, GdkPixbuf.InterpType.BILINEAR
-                    )
-                except Exception:
-                    pass
-            self.art_area.queue_draw()
-            self.set_size_request(440, -1)
-            self.resize(440, 1)
         else:
-            self.art_area.hide()
-            self.lbl_artist.hide()
-            self.lbl_title.hide()
             self.progress_box.hide()
-            self.ctrl_row.hide()
-            self.set_size_request(320, -1)
-            self.resize(320, 1)
+
+        self._art_pixbuf = None
+        if is_media_active and art_url:
+            try:
+                if art_url.startswith("file://"):
+                    art_path = urllib.parse.unquote(art_url[7:])
+                else:
+                    art_path = "/tmp/osd_art.jpg"
+                    urllib.request.urlretrieve(art_url, art_path)
+                
+                pb = GdkPixbuf.Pixbuf.new_from_file(art_path)
+                self._art_pixbuf = pb.scale_simple(
+                    self.ART_SIZE, self.ART_SIZE, GdkPixbuf.InterpType.BILINEAR
+                )
+            except Exception:
+                pass
+        self.art_area.queue_draw()
+        self.set_size_request(440, -1)
+        self.resize(440, 1)
 
     def draw_progress(self, widget, cr):
         w = widget.get_allocated_width()
@@ -603,5 +597,5 @@ class OSDWindow(Gtk.Window):
         cr.stroke()
 
 win = OSDWindow()
-win.show()
+win.show_all()
 Gtk.main()
