@@ -22,7 +22,8 @@ sudo apt-get install -y \
     pulseaudio-utils \
     brightnessctl \
     python3-qrcode \
-    picom
+    picom \
+    playerctl
 
 # 2. Quitar el menú viejo (xfce4-panel)
 echo "🧹 Deshabilitando el panel por defecto de XFCE..."
