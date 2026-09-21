@@ -150,6 +150,12 @@ class QuickPanel(Gtk.Window):
         GLib.idle_add(self.refresh_windows)
         GLib.idle_add(self.reposition)
         GLib.timeout_add(500, self.remove_struts)
+        # Re-run reposition after delays to handle cases where GTK
+        # hasn't calculated the real panel height yet on first draw
+        GLib.timeout_add(500,  self.reposition)
+        GLib.timeout_add(1000, self.reposition)
+        GLib.timeout_add(2000, self.reposition)
+        GLib.timeout_add(3000, self.reposition)
         
         self.hide_timer = GLib.timeout_add(2000, self.hide_panel)
 
@@ -508,13 +514,16 @@ class QuickPanel(Gtk.Window):
         self.set_size_request(target_width, -1)
         
         width, height = self.get_size()
+        
+        # If height is 0 (not rendered yet), skip — a delayed call will fix it
+        if height < 10:
+            return False
+
         x = geometry.x + 16
         self.base_y = geometry.y + geometry.height - height
-        
-        if self.current_y == 0:
-            self.current_y = self.base_y
-            self.move(x, self.base_y)
-            self.resize(target_width, height)
+        self.current_y = self.base_y
+        self.move(x, self.base_y)
+        self.resize(target_width, height)
             
         return False
 
