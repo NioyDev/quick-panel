@@ -61,7 +61,7 @@ systemctl --user restart quick-panel.service
 systemctl --user restart quick-notifications.service
 
 # OSD de volumen (se lanza desde el script de inicio)
-DISPLAY=:0.0 nohup python3 ~/.local/bin/win11-osd.py > /dev/null 2>&1 &
+DISPLAY=:0.0 nohup python3 ~/.local/bin/quick-osd.py > /dev/null 2>&1 &
 
 echo ""
 echo "🎉 ¡Instalación completa!"

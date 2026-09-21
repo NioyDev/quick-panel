@@ -12,7 +12,7 @@ build/
 # Logs del panel
 /tmp/quick-panel.log
 /tmp/quick-notifications.log
-/tmp/win11-osd.log
+/tmp/quick-osd.log
 *.log
 
 # Entornos virtuales

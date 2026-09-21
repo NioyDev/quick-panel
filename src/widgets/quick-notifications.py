@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 quick-notifications.py - Sistema de notificaciones premium para Quick Panel
-Diseño estilo iOS Now Playing con controles de música y barra de progreso.
+Tarjeta de música estilo elegante con bordes redondeados, portada a la izquierda,
+progreso acentuado y controles integrados.
 """
 import sys
 import os
@@ -83,10 +84,10 @@ def draw_rounded_rect(cr, x, y, w, h, r):
 
 
 class MediaNotificationWindow(Gtk.Window):
-    """Tarjeta de música estilo iOS Now Playing."""
+    """Tarjeta de música estilo player moderno con bordes redondeados."""
 
-    CARD_W = 420
-    ART_SIZE = 80
+    CARD_W = 450
+    ART_SIZE = 96
 
     def __init__(self, id, app_name, summary, body, hints, on_close_callback):
         super().__init__(type=Gtk.WindowType.POPUP)
@@ -118,56 +119,56 @@ class MediaNotificationWindow(Gtk.Window):
 
         self.connect("draw", self.on_draw)
 
-        # ─── Layout ───────────────────────────────────────────────
-        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-        outer.set_margin_top(18)
-        outer.set_margin_bottom(20)
-        outer.set_margin_start(18)
-        outer.set_margin_end(18)
+        # Outer Horizontal Box: [ Album Cover ] [ Info + Progress + Controls ]
+        outer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        outer.set_margin_top(16)
+        outer.set_margin_bottom(16)
+        outer.set_margin_start(16)
+        outer.set_margin_end(16)
         self.add(outer)
 
-        # ── Top row: art + title + artist ─────────────────────────
-        top_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
-        outer.pack_start(top_row, False, False, 0)
-
-        # Album art (drawn by Cairo for rounded corners)
+        # 1. Left: Album art with rounded corners
         self.art_area = Gtk.DrawingArea()
         self.art_area.set_size_request(self.ART_SIZE, self.ART_SIZE)
+        self.art_area.set_valign(Gtk.Align.CENTER)
         self.art_area.connect("draw", self.draw_album_art)
-        top_row.pack_start(self.art_area, False, False, 0)
+        outer.pack_start(self.art_area, False, False, 0)
 
-        # Song info column
-        info_col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        info_col.set_valign(Gtk.Align.CENTER)
-        top_row.pack_start(info_col, True, True, 0)
+        # 2. Right: Content column
+        right_col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+        right_col.set_valign(Gtk.Align.CENTER)
+        outer.pack_start(right_col, True, True, 0)
 
-        self.lbl_title = Gtk.Label()
-        self.lbl_title.set_halign(Gtk.Align.START)
-        self.lbl_title.set_markup(
-            f"<span font='15' weight='bold' color='#ffffff'>"
-            f"{GLib.markup_escape_text(summary)}</span>"
-        )
-        self.lbl_title.set_ellipsize(Pango.EllipsizeMode.END)
-        self.lbl_title.set_max_width_chars(20)
-        info_col.pack_start(self.lbl_title, False, False, 0)
-
+        # Artist / App Subtitle (muted small caps)
+        artist_text = (body if body else app_name).upper()
         self.lbl_artist = Gtk.Label()
         self.lbl_artist.set_halign(Gtk.Align.START)
         self.lbl_artist.set_markup(
-            f"<span font='13' color='#888888'>"
-            f"{GLib.markup_escape_text(body)}</span>"
+            f"<span font='9' weight='bold' color='#a1a1aa'>"
+            f"{GLib.markup_escape_text(artist_text)}</span>"
         )
         self.lbl_artist.set_ellipsize(Pango.EllipsizeMode.END)
-        self.lbl_artist.set_max_width_chars(20)
-        info_col.pack_start(self.lbl_artist, False, False, 0)
+        self.lbl_artist.set_max_width_chars(25)
+        right_col.pack_start(self.lbl_artist, False, False, 0)
 
-        # ── Progress bar area ──────────────────────────────────────
-        progress_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        progress_box.set_margin_top(14)
-        outer.pack_start(progress_box, False, False, 0)
+        # Song Title (prominent bold white)
+        self.lbl_title = Gtk.Label()
+        self.lbl_title.set_halign(Gtk.Align.START)
+        self.lbl_title.set_markup(
+            f"<span font='13' weight='bold' color='#ffffff'>"
+            f"{GLib.markup_escape_text(summary)}</span>"
+        )
+        self.lbl_title.set_ellipsize(Pango.EllipsizeMode.END)
+        self.lbl_title.set_max_width_chars(25)
+        right_col.pack_start(self.lbl_title, False, False, 0)
+
+        # Progress bar container
+        progress_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+        progress_box.set_margin_top(4)
+        right_col.pack_start(progress_box, False, False, 0)
 
         self.progress_area = Gtk.DrawingArea()
-        self.progress_area.set_size_request(-1, 4)
+        self.progress_area.set_size_request(-1, 5)
         self.progress_area.connect("draw", self.draw_progress)
         progress_box.pack_start(self.progress_area, False, False, 0)
 
@@ -175,30 +176,30 @@ class MediaNotificationWindow(Gtk.Window):
         progress_box.pack_start(time_row, False, False, 0)
 
         self.lbl_pos = Gtk.Label()
-        self.lbl_pos.set_markup("<span font='11' color='#666666'>0:00</span>")
+        self.lbl_pos.set_markup("<span font='9' color='#71717a'>0:00</span>")
         self.lbl_pos.set_halign(Gtk.Align.START)
         time_row.pack_start(self.lbl_pos, True, True, 0)
 
         self.lbl_dur = Gtk.Label()
-        self.lbl_dur.set_markup("<span font='11' color='#666666'>0:00</span>")
+        self.lbl_dur.set_markup("<span font='9' color='#71717a'>0:00</span>")
         self.lbl_dur.set_halign(Gtk.Align.END)
         time_row.pack_end(self.lbl_dur, False, False, 0)
 
-        # ── Controls row ───────────────────────────────────────────
-        ctrl_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        # Controls row centered at bottom right
+        ctrl_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
         ctrl_row.set_halign(Gtk.Align.CENTER)
-        ctrl_row.set_margin_top(12)
-        outer.pack_start(ctrl_row, False, False, 0)
+        ctrl_row.set_margin_top(4)
+        right_col.pack_start(ctrl_row, False, False, 0)
 
-        self.btn_prev = self._make_ctrl_btn("media-skip-backward-symbolic", self.on_prev, 48)
-        self.btn_play = self._make_ctrl_btn("media-playback-pause-symbolic", self.on_play_pause, 56)
-        self.btn_next = self._make_ctrl_btn("media-skip-forward-symbolic", self.on_next, 48)
+        self.btn_prev = self._make_ctrl_btn("media-skip-backward-symbolic", self.on_prev, 36)
+        self.btn_play = self._make_ctrl_btn("media-playback-pause-symbolic", self.on_play_pause, 42)
+        self.btn_next = self._make_ctrl_btn("media-skip-forward-symbolic", self.on_next, 36)
 
-        ctrl_row.pack_start(self.btn_prev, False, False, 12)
-        ctrl_row.pack_start(self.btn_play, False, False, 16)
-        ctrl_row.pack_start(self.btn_next, False, False, 12)
+        ctrl_row.pack_start(self.btn_prev, False, False, 0)
+        ctrl_row.pack_start(self.btn_play, False, False, 0)
+        ctrl_row.pack_start(self.btn_next, False, False, 0)
 
-        # ── Init art and position ──────────────────────────────────
+        # Init art and position
         self._load_art(hints, None)
         self._fetch_progress()
 
@@ -213,8 +214,6 @@ class MediaNotificationWindow(Gtk.Window):
 
         self.timeout_id = GLib.timeout_add(12000, self.auto_close)
         self.progress_timer = GLib.timeout_add(1000, self._tick_progress)
-
-    # ─── Art ──────────────────────────────────────────────────────
 
     def _load_art(self, hints, icon_str):
         pixbuf = None
@@ -239,7 +238,7 @@ class MediaNotificationWindow(Gtk.Window):
 
     def draw_album_art(self, widget, cr):
         w = h = self.ART_SIZE
-        r = 12.0
+        r = 14.0
         draw_rounded_rect(cr, 0, 0, w, h, r)
         cr.clip()
 
@@ -247,22 +246,19 @@ class MediaNotificationWindow(Gtk.Window):
             Gdk.cairo_set_source_pixbuf(cr, self._art_pixbuf, 0, 0)
             cr.paint()
         else:
-            # Placeholder gradient
             grad = cairo.LinearGradient(0, 0, w, h)
-            grad.add_color_stop_rgb(0, 0.15, 0.15, 0.20)
-            grad.add_color_stop_rgb(1, 0.25, 0.12, 0.35)
+            grad.add_color_stop_rgb(0, 0.22, 0.18, 0.32)
+            grad.add_color_stop_rgb(1, 0.12, 0.12, 0.20)
             cr.set_source(grad)
             cr.paint()
-            # Music note icon
-            cr.set_source_rgba(1, 1, 1, 0.3)
-            cr.select_font_face("Sans")
-            cr.set_font_size(32)
-            cr.move_to(22, 52)
-            cr.show_text("♪")
+
+            cr.set_source_rgba(1, 1, 1, 0.4)
+            cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+            cr.set_font_size(36)
+            cr.move_to(32, 60)
+            cr.show_text("♫")
 
         return False
-
-    # ─── Progress ─────────────────────────────────────────────────
 
     def _fetch_progress(self):
         try:
@@ -276,10 +272,10 @@ class MediaNotificationWindow(Gtk.Window):
                 if dur_us > 0:
                     self._progress_fraction = min(1.0, pos_us / dur_us)
                 self.lbl_pos.set_markup(
-                    f"<span font='11' color='#666666'>{format_time(pos_us)}</span>"
+                    f"<span font='9' color='#71717a'>{format_time(pos_us)}</span>"
                 )
                 self.lbl_dur.set_markup(
-                    f"<span font='11' color='#666666'>{format_time(dur_us)}</span>"
+                    f"<span font='9' color='#71717a'>{format_time(dur_us)}</span>"
                 )
         except Exception:
             pass
@@ -290,30 +286,28 @@ class MediaNotificationWindow(Gtk.Window):
             self._position_us += 1_000_000
             self._progress_fraction = min(1.0, self._position_us / self._duration_us)
             self.lbl_pos.set_markup(
-                f"<span font='11' color='#666666'>{format_time(self._position_us)}</span>"
+                f"<span font='9' color='#71717a'>{format_time(self._position_us)}</span>"
             )
             self.progress_area.queue_draw()
         return True
 
     def draw_progress(self, widget, cr):
         w = widget.get_allocated_width()
-        h = 4
+        h = 5
 
-        # Track
+        # Track background
         cr.set_source_rgba(1, 1, 1, 0.15)
-        draw_rounded_rect(cr, 0, 0, w, h, 2)
+        draw_rounded_rect(cr, 0, 0, w, h, 2.5)
         cr.fill()
 
-        # Fill
+        # Fill track with accent coral/pink
         fill_w = int(w * self._progress_fraction)
         if fill_w > 4:
-            cr.set_source_rgba(1, 1, 1, 0.85)
-            draw_rounded_rect(cr, 0, 0, fill_w, h, 2)
+            cr.set_source_rgba(244/255, 114/255, 182/255, 0.95)
+            draw_rounded_rect(cr, 0, 0, fill_w, h, 2.5)
             cr.fill()
 
         return False
-
-    # ─── Controls ─────────────────────────────────────────────────
 
     def _make_ctrl_btn(self, icon_name, callback, size):
         btn = Gtk.Button()
@@ -325,16 +319,16 @@ class MediaNotificationWindow(Gtk.Window):
         btn.set_size_request(size, size)
         css = f"""
         button {{
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: {size//2}px;
             border: none;
             padding: 0;
         }}
         button:hover {{
-            background: rgba(255,255,255,0.18);
+            background: rgba(255, 255, 255, 0.18);
         }}
         button:active {{
-            background: rgba(255,255,255,0.28);
+            background: rgba(255, 255, 255, 0.28);
         }}
         """
         provider = Gtk.CssProvider()
@@ -363,21 +357,20 @@ class MediaNotificationWindow(Gtk.Window):
         self.timeout_id = GLib.timeout_add(12000, self.auto_close)
 
     def update_content(self, summary, body, hints=None, icon_str=None):
-        self.lbl_title.set_markup(
-            f"<span font='15' weight='bold' color='#ffffff'>"
-            f"{GLib.markup_escape_text(summary)}</span>"
-        )
+        artist_text = (body if body else self.app_name).upper()
         self.lbl_artist.set_markup(
-            f"<span font='13' color='#888888'>"
-            f"{GLib.markup_escape_text(body)}</span>"
+            f"<span font='9' weight='bold' color='#a1a1aa'>"
+            f"{GLib.markup_escape_text(artist_text)}</span>"
+        )
+        self.lbl_title.set_markup(
+            f"<span font='13' weight='bold' color='#ffffff'>"
+            f"{GLib.markup_escape_text(summary)}</span>"
         )
         if hints:
             self._load_art(hints, icon_str)
             self.art_area.queue_draw()
         GLib.timeout_add(300, self._fetch_progress)
         self._reset_timeout()
-
-    # ─── Drawing ──────────────────────────────────────────────────
 
     def on_draw(self, widget, cr):
         cr.set_source_rgba(0, 0, 0, 0)
@@ -386,24 +379,22 @@ class MediaNotificationWindow(Gtk.Window):
 
         w = self.get_allocated_width()
         h = self.get_allocated_height()
-        r = 22.0
+        r = 20.0
 
         cr.set_operator(cairo.OPERATOR_OVER)
 
-        # Main background
-        cr.set_source_rgba(14/255, 14/255, 16/255, 0.97)
+        # Background (dark graphite with 96% opacity)
+        cr.set_source_rgba(24/255, 24/255, 27/255, 0.96)
         draw_rounded_rect(cr, 0, 0, w, h, r)
         cr.fill()
 
-        # Subtle border
-        cr.set_source_rgba(1, 1, 1, 0.07)
+        # Border
+        cr.set_source_rgba(1, 1, 1, 0.1)
         cr.set_line_width(1.0)
         draw_rounded_rect(cr, 0.5, 0.5, w - 1, h - 1, r)
         cr.stroke()
 
         return False
-
-    # ─── Position animation ───────────────────────────────────────
 
     def slide_to_y(self, target_y):
         self.target_y = target_y
@@ -448,7 +439,7 @@ class NotificationWindow(Gtk.Window):
         self.timeout_id = None
         self.animating = False
 
-        self.set_default_size(370, -1)
+        self.set_default_size(380, -1)
         self.set_resizable(False)
         self.set_decorated(False)
         self.set_app_paintable(True)
@@ -498,7 +489,7 @@ class NotificationWindow(Gtk.Window):
         self.lbl_body = Gtk.Label()
         self.lbl_body.set_halign(Gtk.Align.START)
         self.lbl_body.set_markup(
-            f"<span font='12' color='#999999'>{GLib.markup_escape_text(display_body)}</span>"
+            f"<span font='12' color='#a1a1aa'>{GLib.markup_escape_text(display_body)}</span>"
         )
         self.lbl_body.set_line_wrap(True)
         self.lbl_body.set_lines(2)
@@ -529,28 +520,28 @@ class NotificationWindow(Gtk.Window):
 
         w = self.get_allocated_width()
         h = self.get_allocated_height()
-        r = 16.0
+        r = 20.0
 
         cr.set_operator(cairo.OPERATOR_OVER)
-        cr.set_source_rgba(16/255, 16/255, 20/255, 0.97)
+        cr.set_source_rgba(24/255, 24/255, 27/255, 0.96)
         draw_rounded_rect(cr, 0, 0, w, h, r)
         cr.fill()
 
-        cr.set_source_rgba(1, 1, 1, 0.07)
+        cr.set_source_rgba(1, 1, 1, 0.1)
         cr.set_line_width(1.0)
         draw_rounded_rect(cr, 0.5, 0.5, w - 1, h - 1, r)
         cr.stroke()
 
     def update_content(self, summary, body, hints=None, icon_str=None):
         self.count += 1
-        suffix = f" <span color='#5b9bd5' font='11'>[x{self.count}]</span>" if self.count > 1 else ""
+        suffix = f" <span color='#60a5fa' font='11'>[x{self.count}]</span>" if self.count > 1 else ""
         self.lbl_title.set_markup(
             f"<span font='13' weight='bold' color='#ffffff'>"
             f"{GLib.markup_escape_text(summary)}</span>{suffix}"
         )
         display_body = body[:115] + "..." if len(body) > 115 else body
         self.lbl_body.set_markup(
-            f"<span font='12' color='#999999'>{GLib.markup_escape_text(display_body)}</span>"
+            f"<span font='12' color='#a1a1aa'>{GLib.markup_escape_text(display_body)}</span>"
         )
         if self.timeout_id:
             GLib.source_remove(self.timeout_id)
@@ -606,6 +597,17 @@ class NotificationServer(dbus.service.Object):
         self.next_id = 1
         self.windows = []
 
+        try:
+            session_bus = dbus.SessionBus()
+            session_bus.add_signal_receiver(
+                self.on_mpris_properties_changed,
+                signal_name="PropertiesChanged",
+                dbus_interface="org.freedesktop.DBus.Properties",
+                path="/org/mpris/MediaPlayer2"
+            )
+        except Exception:
+            pass
+
     @dbus.service.method('org.freedesktop.Notifications', out_signature='ssss')
     def GetServerInformation(self):
         return ("QuickNotifications", "QuickPanel", "2.0", "1.2")
@@ -653,11 +655,13 @@ class NotificationServer(dbus.service.Object):
 
         if media:
             new_win = MediaNotificationWindow(
-                nid, app_name_str, summary_str, str(body), hints, self.on_window_closed
+                nid, app_name_str, summary_str, str(body), hints,
+                self.on_window_closed
             )
         else:
             new_win = NotificationWindow(
-                nid, app_name_str, summary_str, str(body), self.on_window_closed
+                nid, app_name_str, summary_str, str(body),
+                self.on_window_closed
             )
             new_win.set_icon(icon_str)
 
@@ -680,13 +684,39 @@ class NotificationServer(dbus.service.Object):
     def on_window_closed(self, closed_id, from_dbus=False):
         for i, win in enumerate(self.windows):
             if win.id == closed_id:
-                if from_dbus:
-                    win.close_now()
+                if not from_dbus:
+                    pass
                 self.windows.pop(i)
-                self.update_positions()
                 break
+        GLib.timeout_add(50, self.update_positions)
+
+    def on_mpris_properties_changed(self, interface_name, changed_properties, invalidated_properties, sender=None):
+        if interface_name != 'org.mpris.MediaPlayer2.Player':
+            return
+        if 'Metadata' in changed_properties or 'PlaybackStatus' in changed_properties:
+            GLib.idle_add(self.handle_mpris_track_change)
+
+    def handle_mpris_track_change(self):
+        title = get_playerctl_value(["metadata", "xesam:title"])
+        artist = get_playerctl_value(["metadata", "xesam:artist"])
+        art_url = get_playerctl_value(["metadata", "mpris:artUrl"])
+
+        if not title:
+            return
+
+        hints = {}
+        if art_url:
+            hints["image-path"] = art_url
+
+        # Only update an already visible notification window
+        for win in self.windows:
+            if isinstance(win, MediaNotificationWindow):
+                win.update_content(title, artist, hints, art_url)
+                GLib.timeout_add(50, self.update_positions)
+                return
 
 
 if __name__ == '__main__':
     server = NotificationServer()
-    Gtk.main()
+    loop = GLib.MainLoop()
+    loop.run()
