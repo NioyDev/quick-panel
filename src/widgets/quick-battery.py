@@ -2,6 +2,23 @@
 import gi
 import os
 import subprocess
+import sys
+import signal
+
+# Check for existing instance to toggle off
+try:
+    pids = subprocess.check_output(["pgrep", "-f", "quick-battery.py"]).decode().strip().split('\n')
+    current_pid = str(os.getpid())
+    other_pids = [p for p in pids if p and p != current_pid]
+    if other_pids:
+        for pid_str in other_pids:
+            try:
+                os.kill(int(pid_str), signal.SIGTERM)
+            except Exception:
+                pass
+        sys.exit(0)
+except Exception:
+    pass
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, Pango
@@ -69,6 +86,9 @@ class QuickBattery(Gtk.Window):
         self.move(monitor.width - 340, monitor.height - 450)
         
         self.set_decorated(False)
+        self.set_skip_taskbar_hint(True)
+        self.set_skip_pager_hint(True)
+        self.set_keep_above(True)
         self.set_app_paintable(True)
         
         # Activar fondo transparente (Glassmorphism)
@@ -84,10 +104,12 @@ class QuickBattery(Gtk.Window):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
         
+        self.connect("focus-out-event", lambda *args: Gtk.main_quit())
         self.connect("map-event", self.on_map)
         self.connect("unmap-event", self.on_unmap)
         self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
         self.connect("button-press-event", self.on_button_press)
+        self.connect("key-press-event", self.on_key_press)
 
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         self.main_box.set_name("main_box")
@@ -155,6 +177,12 @@ class QuickBattery(Gtk.Window):
     def on_button_press(self, widget, event):
         width, height = self.get_size()
         if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+            Gtk.main_quit()
+            return True
+        return False
+
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Escape:
             Gtk.main_quit()
             return True
         return False

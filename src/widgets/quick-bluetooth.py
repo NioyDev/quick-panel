@@ -2,6 +2,24 @@
 import gi
 import subprocess
 import threading
+import os
+import sys
+import signal
+
+try:
+    pids = subprocess.check_output(["pgrep", "-f", "quick-bluetooth.py"]).decode().strip().split('\n')
+    current_pid = str(os.getpid())
+    other_pids = [p for p in pids if p and p != current_pid]
+    if other_pids:
+        for pid_str in other_pids:
+            try:
+                os.kill(int(pid_str), signal.SIGTERM)
+            except Exception:
+                pass
+        sys.exit(0)
+except Exception:
+    pass
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('Pango', '1.0')
 from gi.repository import Gtk, Gdk, GLib, Pango
