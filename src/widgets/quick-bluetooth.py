@@ -222,7 +222,7 @@ class QuickBluetooth(Gtk.Window):
 
     def on_map(self, widget, event):
         seat = Gdk.Display.get_default().get_default_seat()
-        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL_POINTING, True, None, None, None)
+        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL_POINTING, False, None, None, None)
         return False
         
     def on_unmap(self, widget, event):

@@ -13,7 +13,7 @@ try:
     if other_pids:
         for pid_str in other_pids:
             try:
-                os.kill(int(pid_str), signal.SIGTERM)
+                os.kill(int(pid_str), signal.SIGKILL)
             except Exception:
                 pass
         sys.exit(0)
@@ -166,7 +166,7 @@ class QuickBattery(Gtk.Window):
 
     def on_map(self, widget, event):
         seat = Gdk.Display.get_default().get_default_seat()
-        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL_POINTING, True, None, None, None)
+        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL, False, None, None, None)
         return False
         
     def on_unmap(self, widget, event):
@@ -175,8 +175,9 @@ class QuickBattery(Gtk.Window):
         return False
 
     def on_button_press(self, widget, event):
-        width, height = self.get_size()
-        if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
+        w = self.get_allocated_width()
+        h = self.get_allocated_height()
+        if event.x < 0 or event.x > w or event.y < 0 or event.y > h:
             Gtk.main_quit()
             return True
         return False

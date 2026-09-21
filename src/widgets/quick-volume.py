@@ -13,7 +13,7 @@ try:
     if other_pids:
         for pid_str in other_pids:
             try:
-                os.kill(int(pid_str), signal.SIGTERM)
+                os.kill(int(pid_str), signal.SIGKILL)
             except Exception:
                 pass
         sys.exit(0)
@@ -242,7 +242,7 @@ class QuickVolume(Gtk.Window):
 
     def on_map(self, widget, event):
         seat = Gdk.Display.get_default().get_default_seat()
-        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL_POINTING, True, None, None, None)
+        seat.grab(self.get_window(), Gdk.SeatCapabilities.ALL_POINTING, False, None, None, None)
         return False
         
     def on_unmap(self, widget, event):
