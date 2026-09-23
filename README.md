@@ -35,10 +35,10 @@ cd quick-panel
 ```
 
 > **¿Qué hace el instalador de Linux?**
-> - Instala automáticamente todas las dependencias (`python3-gi`, `cairo`, `xdotool`, `pulseaudio-utils`, etc).
-> - Deshabilita el panel clásico viejo de XFCE.
-> - Copia los archivos del sistema a `~/.local/bin/`.
-> - Activa los demonios y servicios `systemd` para arranque automático.
+> - Instala automáticamente todas las dependencias (`python3-gi`, `cairo`, `xdotool`, `pulseaudio-utils`, `qrcode`, etc.).
+> - Configura e inicia la barra automáticamente sin alterar ni borrar nada de tu entorno actual.
+> - Copia los archivos necesarios a `~/.local/bin/`.
+> - Activa el inicio automático en el inicio de sesión (`autostart` y `systemd`).
 
 ---
 
