@@ -8,7 +8,7 @@ set -e
 echo "🚀 Iniciando instalación de Quick Panel..."
 
 # 1. Instalar dependencias del sistema según el gestor de paquetes
-echo "📦 Verificando e instalando dependencias..."
+echo "📦 Verificando e instalando dependencias del sistema..."
 
 if command -v apt-get >/dev/null 2>&1; then
     echo "ℹ️  Detectado sistema basado en APT (Debian/Ubuntu/Mint)..."
@@ -21,6 +21,7 @@ if command -v apt-get >/dev/null 2>&1; then
         gir1.2-wnck-3.0 \
         gir1.2-glib-2.0 \
         python3-cairo \
+        python3-dbus \
         xdotool \
         wmctrl \
         pulseaudio-utils \
@@ -38,6 +39,7 @@ elif command -v pacman >/dev/null 2>&1; then
         gtk3 \
         libwnck3 \
         python-cairo \
+        python-dbus \
         xdotool \
         wmctrl \
         libpulse \
@@ -53,6 +55,7 @@ elif command -v dnf >/dev/null 2>&1; then
         gtk3 \
         libwnck3 \
         python3-cairo \
+        python3-dbus \
         xdotool \
         wmctrl \
         pulseaudio-utils \
@@ -65,7 +68,15 @@ fi
 # Instalar modulo qrcode de Python si no esta instalado
 python3 -c "import qrcode" 2>/dev/null || python3 -m pip install --user qrcode || true
 
-# 2. Copiar archivos al directorio local de binarios (~/.local/bin)
+# 2. Deshabilitar el panel anterior de XFCE para reemplazarlo por Quick Panel
+if command -v xfce4-panel >/dev/null 2>&1; then
+    echo "🧹 Quitando el panel clásico anterior..."
+    xfce4-panel -q 2>/dev/null || true
+    rm -rf ~/.cache/sessions/* 2>/dev/null || true
+    xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command -t string -s "" -a 2>/dev/null || true
+fi
+
+# 3. Copiar archivos al directorio local de binarios (~/.local/bin)
 echo "📂 Instalando archivos ejecutables en ~/.local/bin/ ..."
 mkdir -p ~/.local/bin ~/.config/systemd/user ~/.config/autostart
 
@@ -78,7 +89,7 @@ cp src/widgets/*.py            ~/.local/bin/
 chmod +x ~/.local/bin/*.py
 [ -f ~/.local/bin/start-quick-panel.sh ] && chmod +x ~/.local/bin/start-quick-panel.sh
 
-# 3. Configurar Inicio Automático (.desktop en autostart)
+# 4. Configurar Inicio Automático (.desktop en autostart)
 echo "⚙️  Configurando autostart para inicio de sesión..."
 
 cat <<EOF > ~/.config/autostart/quick-panel.desktop
@@ -105,7 +116,7 @@ Categories=Utility;
 X-GNOME-Autostart-enabled=true
 EOF
 
-# 4. Configurar e Iniciar servicios Systemd si está disponible
+# 5. Configurar e Iniciar servicios Systemd si está disponible
 if command -v systemctl >/dev/null 2>&1; then
     echo "🔁 Configurando servicio systemd de usuario..."
     [ -f systemd/quick-panel.service ] && cp systemd/quick-panel.service ~/.config/systemd/user/
@@ -115,8 +126,8 @@ if command -v systemctl >/dev/null 2>&1; then
     systemctl --user enable quick-notifications.service 2>/dev/null || true
 fi
 
-# 5. Iniciar Quick Panel de forma limpia sin interferir con otros paneles
-echo "🚀 Iniciando Quick Panel..."
+# 6. Iniciar Quick Panel inmediatamente
+echo "🚀 Iniciando nuevo Quick Panel..."
 pkill -f quick-panel.py 2>/dev/null || true
 pkill -f quick-notifications.py 2>/dev/null || true
 
@@ -126,6 +137,6 @@ nohup python3 ~/.local/bin/quick-panel.py > /dev/null 2>&1 &
 echo ""
 echo "=========================================="
 echo "🎉 ¡Instalación completada exitosamente!"
-echo "   Quick Panel está listo y ejecutándose."
-echo "   Se iniciará automáticamente al iniciar sesión."
+echo "   El panel anterior ha sido reemplazado por Quick Panel."
+echo "   Se iniciará automáticamente al encender la PC o iniciar sesión."
 echo "=========================================="
