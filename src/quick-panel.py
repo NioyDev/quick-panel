@@ -77,23 +77,23 @@ class QuickPanel(Gtk.Window):
         self.btn_vol = make_indicator()
         self.icon_vol = Gtk.Image.new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.MENU)
         self.btn_vol.add(self.icon_vol)
-        self.btn_vol.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-volume.py"]))
+        self.btn_vol.connect("clicked", lambda x: self.run_widget("quick-volume.py"))
         self.right_box.pack_start(self.btn_vol, False, False, 0)
         
         self.btn_bt = make_indicator()
         self.btn_bt.add(Gtk.Image.new_from_icon_name("bluetooth-active-symbolic", Gtk.IconSize.MENU))
-        self.btn_bt.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-bluetooth.py"]))
+        self.btn_bt.connect("clicked", lambda x: self.run_widget("quick-bluetooth.py"))
         self.right_box.pack_start(self.btn_bt, False, False, 0)
         
         self.btn_bright = make_indicator()
         self.btn_bright.add(Gtk.Image.new_from_icon_name("display-brightness-symbolic", Gtk.IconSize.MENU))
-        self.btn_bright.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-brightness.py"]))
+        self.btn_bright.connect("clicked", lambda x: self.run_widget("quick-brightness.py"))
         self.right_box.pack_start(self.btn_bright, False, False, 0)
         
         self.btn_net = make_indicator()
         self.icon_net = Gtk.Image.new_from_icon_name("network-wireless-signal-excellent-symbolic", Gtk.IconSize.MENU)
         self.btn_net.add(self.icon_net)
-        self.btn_net.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-wifi.py"]))
+        self.btn_net.connect("clicked", lambda x: self.run_widget("quick-wifi.py"))
         self.right_box.pack_start(self.btn_net, False, False, 0)
         
         self.btn_bat = make_indicator()
@@ -103,19 +103,19 @@ class QuickPanel(Gtk.Window):
         box_bat.pack_start(self.icon_bat, False, False, 0)
         box_bat.pack_start(self.lbl_bat, False, False, 0)
         self.btn_bat.add(box_bat)
-        self.btn_bat.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-battery.py"]))
+        self.btn_bat.connect("clicked", lambda x: self.run_widget("quick-battery.py"))
         self.right_box.pack_start(self.btn_bat, False, False, 0)
         
         self.btn_time = make_indicator()
         self.lbl_time = Gtk.Label()
         self.lbl_time.set_name("pill_label")
         self.btn_time.add(self.lbl_time)
-        self.btn_time.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-calendar.py"]))
+        self.btn_time.connect("clicked", lambda x: self.run_widget("quick-calendar.py"))
         self.right_box.pack_start(self.btn_time, False, False, 0)
         
         self.btn_power = make_indicator()
         self.btn_power.add(Gtk.Image.new_from_icon_name("system-shutdown-symbolic", Gtk.IconSize.MENU))
-        self.btn_power.connect("clicked", lambda x: subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-power.py"]))
+        self.btn_power.connect("clicked", lambda x: self.run_widget("quick-power.py"))
         self.right_box.pack_start(self.btn_power, False, False, 4)
         
         self.main_box.pack_end(self.right_box, False, False, 4)
@@ -262,8 +262,15 @@ class QuickPanel(Gtk.Window):
         self.current_y = new_y
         return True
 
+    def run_widget(self, name):
+        bin_dir = os.path.expanduser("~/.local/bin")
+        script_path = os.path.join(bin_dir, name)
+        if not os.path.exists(script_path):
+            script_path = os.path.join(os.path.dirname(__file__), "widgets", name)
+        subprocess.Popen([sys.executable, script_path])
+
     def on_launcher_clicked(self, widget):
-        subprocess.Popen(["python3", "/home/nioy/.local/bin/quick-launcher.py"])
+        self.run_widget("quick-launcher.py")
 
     def get_window_class(self, win):
         cg = win.get_class_group()
