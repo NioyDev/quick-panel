@@ -46,7 +46,10 @@ elif command -v pacman >/dev/null 2>&1; then
         brightnessctl \
         python-qrcode \
         picom \
-        playerctl || true
+        playerctl \
+        networkmanager \
+        bluez \
+        bluez-utils || true
 elif command -v dnf >/dev/null 2>&1; then
     echo "ℹ️  Detectado sistema basado en RPM (Fedora/RHEL)..."
     sudo dnf install -y \
@@ -62,7 +65,9 @@ elif command -v dnf >/dev/null 2>&1; then
         brightnessctl \
         python3-qrcode \
         picom \
-        playerctl || true
+        playerctl \
+        NetworkManager \
+        bluez || true
 fi
 
 # Instalar modulo qrcode de Python si no esta instalado
