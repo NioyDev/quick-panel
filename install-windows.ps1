@@ -4,19 +4,19 @@
 # =======================================================
 $ErrorActionPreference = "Stop"
 
-Write-Host "🚀 Starting Quick Panel Installation for Windows..." -ForegroundColor Cyan
+Write-Host "[*] Starting Quick Panel Installation for Windows..." -ForegroundColor Cyan
 
 # 1. Check Python
 try {
     $pythonVer = python --version 2>&1
-    Write-Host "✅ Found Python: $pythonVer" -ForegroundColor Green
+    Write-Host "[OK] Found Python: $pythonVer" -ForegroundColor Green
 } catch {
-    Write-Host "⚠️ Python not found in PATH. Please install Python 3.10+ from python.org or Microsoft Store." -ForegroundColor Red
+    Write-Host "[ERROR] Python not found in PATH. Please install Python 3.10+ from python.org or Microsoft Store." -ForegroundColor Red
     Exit 1
 }
 
 # 2. Install Dependencies
-Write-Host "📦 Installing Python dependencies for Windows..." -ForegroundColor Yellow
+Write-Host "[*] Installing Python dependencies for Windows..." -ForegroundColor Yellow
 python -m pip install --upgrade pip
 python -m pip install pygobject pycaw comtypes winsdk pillow pystray
 
@@ -26,7 +26,7 @@ if (-not (Test-Path $installDir)) {
     New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 }
 
-Write-Host "📂 Copying application files to $installDir..." -ForegroundColor Yellow
+Write-Host "[*] Copying application files to $installDir..." -ForegroundColor Yellow
 
 # Copy src and widgets
 Copy-Item -Path "src\*" -Destination $installDir -Recurse -Force
@@ -53,12 +53,12 @@ $Shortcut.WorkingDirectory = $installDir
 $Shortcut.Description = "Quick Panel Windows Startup"
 $Shortcut.Save()
 
-Write-Host "🔁 Created Windows Startup shortcut: $shortcutPath" -ForegroundColor Green
+Write-Host "[OK] Created Windows Startup shortcut: $shortcutPath" -ForegroundColor Green
 
 # 6. Launch Quick Panel
-Write-Host "⚡ Launching Quick Panel..." -ForegroundColor Cyan
+Write-Host "[*] Launching Quick Panel..." -ForegroundColor Cyan
 Start-Process -FilePath "wscript.exe" -ArgumentList """$vbsPath"""
 
 Write-Host ""
-Write-Host "🎉 Quick Panel Windows Installation Complete!" -ForegroundColor Green
-Write-Host "   Quick Panel will run automatically every time Windows starts." -ForegroundColor White
+Write-Host "[OK] Quick Panel Windows Installation Complete!" -ForegroundColor Green
+Write-Host "     Quick Panel will run automatically every time Windows starts." -ForegroundColor White

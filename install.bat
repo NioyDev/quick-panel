@@ -9,11 +9,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0install-windows.ps1"
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo ❌ Installation encountered an error.
+    echo [ERROR] Installation encountered an error.
     pause
     exit /b %ERRORLEVEL%
 )
 
 echo.
-echo ✅ Installed successfully! You can close this window.
+echo [OK] Installed successfully! You can close this window.
 pause

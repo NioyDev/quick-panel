@@ -17,4 +17,4 @@ nohup python3 "$HOME/.local/bin/quick-panel.py"         > /tmp/quick-panel.log  
 nohup python3 "$HOME/.local/bin/quick-notifications.py" > /tmp/quick-notifications.log  2>&1 &
 nohup python3 "$HOME/.local/bin/quick-osd.py"           > /tmp/quick-osd.log            2>&1 &
 
-echo "✅ Quick Panel, Notificaciones y OSD iniciados."
+echo "[OK] Quick Panel, Notificaciones y OSD iniciados."

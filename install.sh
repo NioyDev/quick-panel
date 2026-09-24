@@ -5,13 +5,13 @@
 # ==========================================
 set -e
 
-echo "🚀 Iniciando instalación de Quick Panel..."
+echo "[*] Iniciando instalacion de Quick Panel..."
 
-# 1. Instalar dependencias del sistema según el gestor de paquetes
-echo "📦 Verificando e instalando dependencias del sistema..."
+# 1. Instalar dependencias del sistema segun el gestor de paquetes
+echo "[*] Verificando e instalando dependencias del sistema..."
 
 if command -v apt-get >/dev/null 2>&1; then
-    echo "ℹ️  Detectado sistema basado en APT (Debian/Ubuntu/Mint)..."
+    echo "[INFO] Detectado sistema basado en APT (Debian/Ubuntu/Mint)..."
     sudo apt-get update -qq || true
     sudo apt-get install -y \
         python3 \
@@ -32,7 +32,7 @@ if command -v apt-get >/dev/null 2>&1; then
         network-manager \
         bluez || true
 elif command -v pacman >/dev/null 2>&1; then
-    echo "ℹ️  Detectado sistema basado en Arch (Arch/Manjaro)..."
+    echo "[INFO] Detectado sistema basado en Arch (Arch/Manjaro)..."
     sudo pacman -Sy --needed --noconfirm \
         python \
         python-gobject \
@@ -51,7 +51,7 @@ elif command -v pacman >/dev/null 2>&1; then
         bluez \
         bluez-utils || true
 elif command -v dnf >/dev/null 2>&1; then
-    echo "ℹ️  Detectado sistema basado en RPM (Fedora/RHEL)..."
+    echo "[INFO] Detectado sistema basado en RPM (Fedora/RHEL)..."
     sudo dnf install -y \
         python3 \
         python3-gobject \
@@ -75,14 +75,14 @@ python3 -c "import qrcode" 2>/dev/null || python3 -m pip install --user qrcode |
 
 # 2. Deshabilitar el panel anterior de XFCE para reemplazarlo por Quick Panel
 if command -v xfce4-panel >/dev/null 2>&1; then
-    echo "🧹 Quitando el panel clásico anterior..."
+    echo "[*] Quitando el panel clasico anterior..."
     xfce4-panel -q 2>/dev/null || true
     rm -rf ~/.cache/sessions/* 2>/dev/null || true
     xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command -t string -s "" -a 2>/dev/null || true
 fi
 
 # 3. Copiar archivos al directorio local de binarios (~/.local/bin)
-echo "📂 Instalando archivos ejecutables en ~/.local/bin/ ..."
+echo "[*] Instalando archivos ejecutables en ~/.local/bin/ ..."
 mkdir -p ~/.local/bin ~/.config/systemd/user ~/.config/autostart
 
 # Copiar ejecutables y widgets
@@ -94,14 +94,14 @@ cp src/widgets/*.py            ~/.local/bin/
 chmod +x ~/.local/bin/*.py
 [ -f ~/.local/bin/start-quick-panel.sh ] && chmod +x ~/.local/bin/start-quick-panel.sh
 
-# 4. Configurar Inicio Automático (.desktop en autostart)
-echo "⚙️  Configurando autostart para inicio de sesión..."
+# 4. Configurar Inicio Automatico (.desktop en autostart)
+echo "[*] Configurando autostart para inicio de sesion..."
 
 cat <<EOF > ~/.config/autostart/quick-panel.desktop
 [Desktop Entry]
 Type=Application
 Name=Quick Panel
-Comment=Barra de navegación flotante moderna
+Comment=Barra de navegacion flotante moderna
 Exec=python3 $HOME/.local/bin/quick-panel.py
 Icon=utilities-terminal
 Terminal=false
@@ -121,9 +121,9 @@ Categories=Utility;
 X-GNOME-Autostart-enabled=true
 EOF
 
-# 5. Configurar e Iniciar servicios Systemd si está disponible
+# 5. Configurar e Iniciar servicios Systemd si esta disponible
 if command -v systemctl >/dev/null 2>&1; then
-    echo "🔁 Configurando servicio systemd de usuario..."
+    echo "[*] Configurando servicio systemd de usuario..."
     [ -f systemd/quick-panel.service ] && cp systemd/quick-panel.service ~/.config/systemd/user/
     [ -f systemd/quick-notifications.service ] && cp systemd/quick-notifications.service ~/.config/systemd/user/
     systemctl --user daemon-reload 2>/dev/null || true
@@ -132,7 +132,7 @@ if command -v systemctl >/dev/null 2>&1; then
 fi
 
 # 6. Iniciar Quick Panel inmediatamente
-echo "🚀 Iniciando nuevo Quick Panel..."
+echo "[*] Iniciando nuevo Quick Panel..."
 pkill -f quick-panel.py 2>/dev/null || true
 pkill -f quick-notifications.py 2>/dev/null || true
 
@@ -141,7 +141,7 @@ nohup python3 ~/.local/bin/quick-panel.py > /dev/null 2>&1 &
 
 echo ""
 echo "=========================================="
-echo "🎉 ¡Instalación completada exitosamente!"
-echo "   El panel anterior ha sido reemplazado por Quick Panel."
-echo "   Se iniciará automáticamente al encender la PC o iniciar sesión."
+echo "[OK] Instalacion completada exitosamente!"
+echo "     El panel anterior ha sido reemplazado por Quick Panel."
+echo "     Se iniciara automaticamente al encender la PC o iniciar sesion."
 echo "=========================================="
