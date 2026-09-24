@@ -6,19 +6,28 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "[*] Starting Quick Panel Installation for Windows..." -ForegroundColor Cyan
 
-# 1. Check Python
+# 1. Check Python Version
 try {
     $pythonVer = python --version 2>&1
     Write-Host "[OK] Found Python: $pythonVer" -ForegroundColor Green
+    
+    if ($pythonVer -like "*3.14*" -or $pythonVer -like "*3.15*") {
+        Write-Host ""
+        Write-Host "[ERROR] You are using an experimental/pre-release version of Python ($pythonVer)." -ForegroundColor Red
+        Write-Host "[ERROR] PyGObject on Windows requires a stable Python release (Python 3.10, 3.11, 3.12, or 3.13)." -ForegroundColor Red
+        Write-Host "[ERROR] Please install Python 3.12 or 3.11 from https://www.python.org/downloads/" -ForegroundColor Yellow
+        Write-Host ""
+        Exit 1
+    }
 } catch {
-    Write-Host "[ERROR] Python not found in PATH. Please install Python 3.10+ from python.org or Microsoft Store." -ForegroundColor Red
+    Write-Host "[ERROR] Python not found in PATH. Please install Python 3.12 from python.org or Microsoft Store." -ForegroundColor Red
     Exit 1
 }
 
 # 2. Install Dependencies
 Write-Host "[*] Installing Python dependencies for Windows..." -ForegroundColor Yellow
 python -m pip install --upgrade pip
-python -m pip install pygobject pycaw comtypes winsdk pillow pystray
+python -m pip install --prefer-binary pygobject pycaw comtypes winsdk pillow pystray
 
 # 3. Target Install Directory
 $installDir = "$env:LOCALAPPDATA\QuickPanel"
