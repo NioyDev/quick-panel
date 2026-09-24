@@ -6,22 +6,45 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "[*] Starting Quick Panel Installation for Windows..." -ForegroundColor Cyan
 
+function Install-Python311 {
+    Write-Host "[*] Downloading Python 3.11.9 (stable)..." -ForegroundColor Yellow
+    $url = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
+    $installerPath = "$env:TEMP\python-3.11.9-amd64.exe"
+    
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Invoke-WebRequest -Uri $url -OutFile $installerPath
+    
+    Write-Host "[*] Installing Python 3.11.9 silently..." -ForegroundColor Yellow
+    Start-Process -FilePath $installerPath -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0" -Wait
+    
+    # Refresh PATH for current session
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+}
+
 # 1. Check Python Version
+$needPython = $false
 try {
     $pythonVer = python --version 2>&1
     Write-Host "[OK] Found Python: $pythonVer" -ForegroundColor Green
     
     if ($pythonVer -like "*3.14*" -or $pythonVer -like "*3.15*") {
-        Write-Host ""
-        Write-Host "[ERROR] You are using an experimental/pre-release version of Python ($pythonVer)." -ForegroundColor Red
-        Write-Host "[ERROR] PyGObject on Windows requires a stable Python release (Python 3.10, 3.11, 3.12, or 3.13)." -ForegroundColor Red
-        Write-Host "[ERROR] Please install Python 3.12 or 3.11 from https://www.python.org/downloads/" -ForegroundColor Yellow
-        Write-Host ""
-        Exit 1
+        Write-Host "[WARNING] Detected incompatible Python pre-release ($pythonVer)." -ForegroundColor Red
+        $needPython = $true
     }
 } catch {
-    Write-Host "[ERROR] Python not found in PATH. Please install Python 3.12 from python.org or Microsoft Store." -ForegroundColor Red
-    Exit 1
+    Write-Host "[WARNING] Python not found in PATH." -ForegroundColor Yellow
+    $needPython = $true
+}
+
+if ($needPython) {
+    Install-Python311
+    try {
+        $pythonVer = python --version 2>&1
+        Write-Host "[OK] Python 3.11 installed successfully: $pythonVer" -ForegroundColor Green
+    } catch {
+        Write-Host "[ERROR] Could not run python after installation. Please restart your terminal." -ForegroundColor Red
+        Exit 1
+    }
 }
 
 # 2. Install Dependencies
